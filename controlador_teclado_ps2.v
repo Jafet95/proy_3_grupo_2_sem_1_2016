@@ -27,6 +27,7 @@ output wire [7:0] ascii_code
 
 //Declaración de constantes
 localparam W = 2; // número de bits de dirección del FIFO
+localparam B = 8; // Tamaño de la dirección del FIFO
 
 //Declaración de señales de conexión
 wire [10:0] dout;
@@ -57,7 +58,7 @@ identificador_teclas instancia_identificador_teclas
 );
 
 fifo
-#(.B(8), // número de bits de cada palabra
+#(.B(B), // número de bits de cada palabra
 .W(W))  // número de bits de dirección (capacidad máxima 2^W) 
 
 instancia_fifo
@@ -78,5 +79,5 @@ keycode_to_ascii instancia_keycode_to_ascii
 .ascii_code(ascii_code)
 );
 
-assign rd_key_code = ~fifo_empty_flag;
+assign rd_key_code = ~fifo_empty_flag;//Si no está vacío se lee el FIFO
 endmodule
