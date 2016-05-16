@@ -33,9 +33,8 @@ localparam B = 8; // Tamaño de la dirección del FIFO
 wire [10:0] dout;
 wire rx_done_tick;
 wire gotten_code_flag;
-wire rd_key_code;
-wire fifo_empty_flag;
 wire [7:0] key_code;
+reg [7:0] key_code_reg, key_code_next;
 
 receptor_teclado_ps2 instancia_receptor_teclado_ps2   
 (
@@ -53,24 +52,8 @@ identificador_teclas instancia_identificador_teclas
 .clk(clk),
 .reset(reset),
 .rx_done_tick(rx_done_tick),
-.dout(dout[8:1]),//Utilizar solo los bits que realmente contienen el código de la tecla
+.dout(dout[8:1]),//Utilizar solo los bits que realmente contienen el código de la tecla [8:1]
 .gotten_code_flag(gotten_code_flag) //Bandera para actualizar el FIFO
-);
-
-fifo
-#(.B(B), // número de bits de cada palabra
-.W(W))  // número de bits de dirección (capacidad máxima 2^W) 
-
-instancia_fifo
-(
-.clk(clk),
-.reset(reset),
-.rd(rd_key_code),//Señal de lectura del FIFO
-.wr(gotten_code_flag),//Señal de escritura del FIFO
-.w_data(dout[8:1]),
-.empty(fifo_empty_flag),
-.full(),
-.r_data(key_code)
 );
 
 keycode_to_ascii instancia_keycode_to_ascii
@@ -79,5 +62,27 @@ keycode_to_ascii instancia_keycode_to_ascii
 .ascii_code(ascii_code)
 );
 
-assign rd_key_code = ~fifo_empty_flag;//Si no está vacío se lee el FIFO
+//===================================================
+// Registro para conservar la última tecla presionada
+//===================================================
+
+//Secuencial
+always@(posedge clk)
+	begin
+		if(reset)
+			key_code_reg <= 8'b0;
+		else
+			key_code_reg <= key_code_next;
+	end
+//Lógica de estado siguiente
+always@*
+	begin
+		case(gotten_code_flag)
+			1'b0://Hold
+				key_code_next = key_code_reg;
+			1'b1://Escribe
+				key_code_next = dout[8:1]; //Utilizar solo los bits que realmente contienen el código de la tecla
+		endcase
+	end
+assign key_code = key_code_reg;
 endmodule
