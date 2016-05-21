@@ -38,10 +38,10 @@ begin
 		8'h2d: ascii_code = 8'h52;//R
 		8'h1b: ascii_code = 8'h53;//S
 		8'h2c: ascii_code = 8'h54;//T
-		8'h2e: ascii_code = 8'h48;//flecha abajo (5)
-		8'h25: ascii_code = 8'h48;//flecha izquierda (4)
-		8'h36: ascii_code = 8'h48;//flecha derecha (6)
-		8'h3e: ascii_code = 8'h48;//flecha arriba (8)
+		8'h72: ascii_code = 8'h35;//flecha abajo (5)
+		8'h6b: ascii_code = 8'h34;//flecha izquierda (4)
+		8'h74: ascii_code = 8'h36;//flecha derecha (6)
+		8'h75: ascii_code = 8'h38;//flecha arriba (8)
 		8'h5a: ascii_code = 8'h0d;//Enter
 		default ascii_code = 8'b0;//NULL char
 	endcase

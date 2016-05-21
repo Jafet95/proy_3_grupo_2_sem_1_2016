@@ -25,10 +25,6 @@ input wire ps2data, ps2clk,
 output wire [7:0] ascii_code
 );
 
-//Declaración de constantes
-localparam W = 2; // número de bits de dirección del FIFO
-localparam B = 8; // Tamaño de la dirección del FIFO
-
 //Declaración de señales de conexión
 wire [10:0] dout;
 wire rx_done_tick;
