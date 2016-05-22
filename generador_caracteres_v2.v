@@ -9,7 +9,7 @@
 // Project Name: 
 // Target Devices: 
 // Tool versions: 
-// Description: Este mï¿½dulo se encarga de generar el texto que se requiere en la imagen del monitor.
+// Description: Este módulo se encarga de generar el texto que se requiere en la imagen del monitor.
 //
 // Dependencies: 
 //
@@ -23,40 +23,40 @@ module generador_caracteres
 input wire clk,
 input wire [3:0] digit0_HH, digit1_HH, digit0_MM, digit1_MM, digit0_SS, digit1_SS,//
 digit0_DAY, digit1_DAY, digit0_MES, digit1_MES, digit0_YEAR, digit1_YEAR,//
-digit0_HH_T, digit1_HH_T, digit0_MM_T, digit1_MM_T, digit0_SS_T, digit1_SS_T,//Decenas y unidades para los nï¿½meros en pantalla (18 inputs de 3 bits)
-input wire AM_PM,//Entrada para conocer si en la informaciï¿½n de hora se despliega AM o PM
+digit0_HH_T, digit1_HH_T, digit0_MM_T, digit1_MM_T, digit0_SS_T, digit1_SS_T,//Decenas y unidades para los números en pantalla (18 inputs de 3 bits)
+input wire AM_PM,//Entrada para conocer si en la información de hora se despliega AM o PM
 input wire parpadeo,//parpadeo del cursor
-input wire [1:0] config_mode,//Cuatro estados del modo configuraciï¿½n
-input wire [1:0] cursor_location,//Marca la posiciï¿½n del cursor en modo configuraciï¿½n
+input wire [1:0] config_mode,//Cuatro estados del modo configuración
+input wire [1:0] cursor_location,//Marca la posición del cursor en modo configuración
 input wire [9:0] pixel_x, pixel_y,//Coordenada de cada pixel
-output wire AMPM_on, //Localizaciï¿½n de esos respectivos textos
+output wire AMPM_on, //Localización de esos respectivos textos
 output wire text_on, //10 "textos" en total en pantalla (bandera de indica que se debe escribir texto)
 output reg [7:0] text_RGB //8 bpp (Nexys 3)
 );
 
-//Declaraciï¿½n de seï¿½ales
+//Declaración de señales
 
 //Font ROM (caracteres 16x32)
 wire [11:0] rom_addr; //ASCII 7-bits + Fila 5-bits
 reg [6:0] char_addr; //ASCII 7-bits
-reg [4:0] row_addr; //Direccion de fila del patrï¿½n de caracter en particular(5 bits)
-reg [3:0] bit_addr; //Columna del pixel particular de un patrï¿½n de caracter (4 bits)
-wire [15:0] font_word;//Fila de pixeles del patrï¿½n de caracter en particular (16 bits)
-wire font_bit;//1 pixel del font_word especï¿½ficado por bit_addr
+reg [4:0] row_addr; //Direccion de fila del patrón de caracter en particular(5 bits)
+reg [3:0] bit_addr; //Columna del pixel particular de un patrón de caracter (4 bits)
+wire [15:0] font_word;//Fila de pixeles del patrón de caracter en particular (16 bits)
+wire font_bit;//1 pixel del font_word específicado por bit_addr
 
-//Direcciones "auxiliares" para cada uno de los dï¿½gitos de los nï¿½meros a mostrar
+//Direcciones "auxiliares" para cada uno de los dígitos de los números a mostrar
 reg [6:0] char_addr_digHORA, char_addr_digFECHA, char_addr_digTIMER, char_addr_AMPM;
 wire [4:0] row_addr_digHORA, row_addr_digFECHA, row_addr_digTIMER,  row_addr_AMPM;
 wire [3:0] bit_addr_digHORA, bit_addr_digFECHA, bit_addr_digTIMER, bit_addr_AMPM; 
 wire digHORA_on, digFECHA_on, digTIMER_on;
 	
-//Instanciaciï¿½n de la font ROM
+//Instanciación de la font ROM
 ROM_16x32 Instancia_ROM_16x32
 (.clk(clk), .addr(rom_addr), .data(font_word));
 
-//Descripciï¿½n de comportamiento
+//Descripción de comportamiento
 
-//1.Dï¿½gitos para representar la HORA(tamaï¿½o de fuente 16x32)
+//1.Dígitos para representar la HORA(tamaño de fuente 16x32)
 assign digHORA_on = (pixel_y[9:5]==2)&&(pixel_x[9:4]>=16)&&(pixel_x[9:4]<=23);
 assign row_addr_digHORA = pixel_y[4:0];
 assign bit_addr_digHORA = pixel_x[3:0];
@@ -77,7 +77,7 @@ begin
 	
 end
 
-//2.Dï¿½gitos para representar la FECHA(tamaï¿½o de fuente 16x32)
+//2.Dígitos para representar la FECHA(tamaño de fuente 16x32)
 assign digFECHA_on = (pixel_y[9:5]==12)&&(pixel_x[9:4]>=7)&&(pixel_x[9:4]<=14);
 assign row_addr_digFECHA = pixel_y[4:0];
 assign bit_addr_digFECHA = pixel_x[3:0];
@@ -91,12 +91,12 @@ begin
 	3'b010: char_addr_digFECHA = {3'b011, digit1_MES};//(decenas MES)
 	3'b011: char_addr_digFECHA = {3'b011, digit0_MES};//(unidades MES)
 	3'b100: char_addr_digFECHA = 7'h2f;//"/"
-	3'b101: char_addr_digFECHA = {3'b011, digit1_YEAR};//(decenas Aï¿½O)
-	3'b110: char_addr_digFECHA = {3'b011, digit0_YEAR};//(unidades	Aï¿½O)
+	3'b101: char_addr_digFECHA = {3'b011, digit1_YEAR};//(decenas AÑO)
+	3'b110: char_addr_digFECHA = {3'b011, digit0_YEAR};//(unidades	AÑO)
 	endcase	
 end
 
-//3.Dï¿½gitos para la cuenta del TIMER(tamaï¿½o de fuente 16x32)
+//3.Dígitos para la cuenta del TIMER(tamaño de fuente 16x32)
 assign digTIMER_on = (pixel_y[9:5]==12)&&(pixel_x[9:4]>=25)&&(pixel_x[9:4]<=32);
 assign row_addr_digTIMER = pixel_y[4:0];
 assign bit_addr_digTIMER = pixel_x[3:0];
@@ -115,7 +115,7 @@ begin
 	endcase	
 end
 
-//8.Palabra AM o PM(tamaï¿½o de fuente 16x32)
+//8.Palabra AM o PM(tamaño de fuente 16x32)
 assign AMPM_on = (pixel_y[9:5]==1)&&(pixel_x[9:4]>=26)&&(pixel_x[9:4]<=27);
 assign row_addr_AMPM = pixel_y[4:0];
 assign bit_addr_AMPM = pixel_x[3:0];
@@ -147,15 +147,15 @@ text_RGB = 8'b0;//Fondo negro
 		char_addr = char_addr_digHORA;
       row_addr = row_addr_digHORA;
       bit_addr = bit_addr_digHORA;
-			//(0: Los dos dï¿½gitos a la derecha, 1: Los dos dï¿½gitos intermedios, 2: Los dos dï¿½gitos a la izquierda, 3: Ubicaciï¿½n de AM/PM)
-			//Evalï¿½a que se estï¿½ configurando (0: modo normal, 1: config.hora, 2: config.fecha, 3: config.timer)
+			//(0: Los dos dígitos a la derecha, 1: Los dos dígitos intermedios, 2: Los dos dígitos a la izquierda, 3: Ubicación de AM/PM)
+			//Evalúa que se está configurando (0: modo normal, 1: config.hora, 2: config.fecha, 3: config.timer)
 			if(font_bit) text_RGB = 8'hFF; //Blanco
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 1)&&(pixel_y[9:6]==2)&&(pixel_x[9:5]>=6)&&(pixel_x[9:5]<=7)&&(cursor_location==2)) 
-			text_RGB =8'h00;//Hace un cursor si se estï¿½ en modo configuraciï¿½n
+			text_RGB =8'h00;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 1)&&(pixel_y[9:6]==2)&&(pixel_x[9:5]>=9)&&(pixel_x[9:5]<=10)&&(cursor_location==1))
-			text_RGB = 8'h00;//Hace un cursor si se estï¿½ en modo configuraciï¿½n
+			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 1)&&(pixel_y[9:6]==2)&&(pixel_x[9:5]>=12)&&(pixel_x[9:5]<=13)&&(cursor_location==0))
-			text_RGB = 8'h000;//Hace un cursor si se estï¿½ en modo configuraciï¿½n
+			text_RGB = 8'h000;//Hace un cursor si se está en modo configuración
 			else if(~font_bit) text_RGB = 8'hAA;//Fondo del texto igual al de los recuadros
 		end
 
@@ -164,14 +164,14 @@ text_RGB = 8'b0;//Fondo negro
 		char_addr = char_addr_digFECHA;
       row_addr = row_addr_digFECHA;
       bit_addr = bit_addr_digFECHA;
-			//(0: Los dos dï¿½gitos a la derecha, 1: Los dos dï¿½gitos intermedios, 2: Los dos dï¿½gitos a la izquierda, 3: Ubicaciï¿½n de dï¿½a semana)
+			//(0: Los dos dígitos a la derecha, 1: Los dos dígitos intermedios, 2: Los dos dígitos a la izquierda, 3: Ubicación de día semana)
 			if(font_bit) text_RGB =8'hFF; //Blanco
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 2)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=7)&&(pixel_x[9:4]<=8)&&(cursor_location==2))
-			text_RGB = 8'h00;//Hace un cursor si se estï¿½ en modo configuraciï¿½n
+			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 2)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=10)&&(pixel_x[9:4]<=11)&&(cursor_location==1))
-			text_RGB = 8'h00;//Hace un cursor si se estï¿½ en modo configuraciï¿½n
+			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 2)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=13)&&(pixel_x[9:4]<=14)&&(cursor_location==0))
-			text_RGB = 8'h00;//Hace un cursor si se estï¿½ en modo configuraciï¿½n
+			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
 			else if(~font_bit) text_RGB = 8'hAA;//Fondo del texto igual al de los recuadros
 		end
 	
@@ -180,14 +180,14 @@ text_RGB = 8'b0;//Fondo negro
 		char_addr = char_addr_digTIMER;
       row_addr = row_addr_digTIMER;
       bit_addr = bit_addr_digTIMER;
-			//(0: Los dos dï¿½gitos a la derecha, 1: Los dos dï¿½gitos intermedios, 2: Los dos dï¿½gitos a la izquierda)
+			//(0: Los dos dígitos a la derecha, 1: Los dos dígitos intermedios, 2: Los dos dígitos a la izquierda)
 			if(font_bit) text_RGB = 8'hFF; //Blanco
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 3)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=25)&&(pixel_x[9:4]<=26)&&(cursor_location==2)) 
-			text_RGB = 8'h00;//Hace un cursor si se estï¿½ en modo configuraciï¿½n
+			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 3)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=28)&&(pixel_x[9:4]<=29)&&(cursor_location==1))
-			text_RGB = 8'h00;//Hace un cursor si se estï¿½ en modo configuraciï¿½n
+			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 3)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=31)&&(pixel_x[9:4]<=32)&&(cursor_location==0))
-			text_RGB = 8'h00;//Hace un cursor si se estï¿½ en modo configuraciï¿½n
+			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
 			else if(~font_bit) text_RGB = 8'hAA;//Fondo del texto igual al de los recuadros
 		end
 		
@@ -211,11 +211,11 @@ endmodule
 /*
 Nota: Los 10 textos a mostrar son
 1.La palabra HORA
-2.Los dï¿½gitos para la hora
-3.Los nï¿½meros de la fecha
-4.El dï¿½a de la semana
+2.Los dígitos para la hora
+3.Los números de la fecha
+4.El día de la semana
 5.La palabra TIMER
-6.Los dï¿½gitos para la cuenta del timer
+6.Los dígitos para la cuenta del timer
 7.La palabra RING
 8.AM o PM
 9.RTC DISPLAY v1.0
