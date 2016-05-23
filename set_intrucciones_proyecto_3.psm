@@ -1,0 +1,151 @@
+;ID_PORT direction
+#EQU rtc_address, 0x00 ; 
+#EQU in_rtc_data, 0x01 ;
+#EQU teclado, 0x02 ;
+#EQU in_seg_hora, 0x03 ;
+#EQU in_min_hora, 0x04 ;
+#EQU in_hora_hora, 0x05 ;
+#EQU in_dia_fecha, 0x06 ;
+#EQU in_mes_fecha, 0x07 ;
+#EQU in_jahr_fecha, 0x08 ;
+#EQU in_dia_semana, 0x09 ;
+#EQU in_seg_timer, 0x0A ;
+#EQU in_min_timer, 0x0B ;
+#EQU in_hora_timer, 0x0C ;
+#EQU formato_hora, 0x0D ;
+#EQU estado_alarma, 0x0F ;
+#EQU generador_signal_control, 0x10 ;
+#EQU fin_rtc, 0x11 ;
+#EQU out_rtc_data, 0x12
+#EQU out_seg_hora, 0x13 ;
+#EQU out_min_hora, 0x44 ;
+#EQU out_hora_hora, 0x15 ;
+#EQU out_dia_fecha, 0x16 ;
+#EQU out_mes_fecha, 0x17 ;
+#EQU out_jahr_fecha, 0x18 ;
+#EQU out_dia_semana, 0x19 ;
+#EQU out_seg_timer, 0x1A ;
+#EQU out_min_timer, 0x1B ;
+#EQU out_hora_timer, 0x1C ;
+
+#EQU address, s0 ; Reg para manejo RTC
+#EQU data, s1;
+#EQU tecla, s2;
+#EQU done, s3;
+inicio:
+	load address, 0x00
+	load in_data_rtc,0x00
+	call escritura
+	load in_data_rtc, 0x01
+	call escritura
+	load address, 0x10
+	load in_data_rtc, 0xd2
+	jump main
+
+main:
+	WRPRT tecla, teclado ; captura tecla
+	load s4, tecla ; guarda lo q tiene 
+	SUB tecla, 0x68
+	call z configurar_hora
+	load tecla, s4
+	SUB tecla, 0x66
+	call z configurar_fecha
+	load tecla, s4
+	SUB tecla, 0x74
+	call z configurar_timer
+	
+configurar_hora:
+	
+lectura_hora_fecha:
+	load address, 0xF0
+	call lectura
+	load address, 0x21 ;lee segundos
+	call lectura
+	WRPRT data, in_seg_hora
+	load address, 0x22 	;lee min
+	call lectura
+	WRPRT data, in_min_hora
+	load address, 0x23 ;lee horas
+	call lectura
+	WRPRT data, in_hora_hora
+	load address, 0x24 	;lee dia
+	call lectura
+	WRPRT data, in_dia_fecha 
+	load address, 0x25 	;lee mes
+	call lectura
+	WRPRT data, in_mes_fecha ;lee jahr
+	load address, 0x26
+	call lectura
+	WRPRT data, in_jahr_fecha
+	load address, 0x27;lee dia_semana
+	call lectura
+	WRPRT data, in_dia_semana
+	ret
+
+lectura_timer:
+	load address, 0x41 	;lee seg_timer
+	call lectura
+	WRPRT data, in_seg_timer ;lee min_timer
+	load address, 0x42
+	call lectura
+	WRPRT data, in_min_timer
+	load address, 0x43 ;lee dia_semana
+	call lectura
+	WRPRT data, in_hora_timer
+	ret
+
+escritura_timer:
+	load address, 0x41 ; escribe seg timer
+	RDPRT data, out_seg_timer
+	call escritura
+	load address, 0x42 ; escribe seg timer
+	RDPRT data, out_min_timer
+	call escritura
+	load address, 0x43 ; escribe seg timer
+	RDPRT data, out_hora_timer
+	call escritura
+	load address, 0xF2 ; escribe comando de escritura
+	RDPRT data, out_hora_timer
+	call escritura
+	ret
+	
+escritura_hora_fecha:
+	load address, 0x21 ; escribe seg hora
+	RDPRT data, out_seg_hora
+	call escritura
+	load address, 0x22 ; escribe min hora
+	RDPRT data, out_min_hora
+	call escritura
+	load address, 0x23 ; escribe hora hora
+	RDPRT data, out_hora_timer
+	call escritura
+	load address, 0x24 ; escribe dia fecha
+	RDPRT data, out_dia_fecha
+	call escritura
+	load address, 0x25 ; escribe mes fecha
+	RDPRT data, out_mes_fecha
+	call escritura
+	load address, 0x26 ; escribe jahr fecha
+	RDPRT data, out_jahr_fecha
+	call escritura
+	load address, 0x27 ; escribe dia semana
+	RDPRT data, out_dia_semana
+	call escritura
+	ret	
+escritura:
+	WRPRT 0x00, signal_control_generation
+	WRPRT address, address_rtc
+	WRPRT data, in_data_rtc
+	call wait
+	ret
+lectura:
+	WRPRT 0x01, signal_control_generation
+	WRPRT address, address_rtc
+	call wait
+	RDPRT dato, out_data_rtc
+	ret
+wait:
+	RDPRT done, fin_rtc
+	SUB done, 0x01
+	jump z lectura
+	ret
