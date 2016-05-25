@@ -62,19 +62,19 @@ de los objetos*/
 assign BOX_H_on = (BOX_H_XL<=pixel_x)&&(pixel_x<=BOX_H_XR)
 						&&(BOX_H_YT<=pixel_y)&&(pixel_y<=BOX_H_YB);
 
-assign BOX_H_RGB = 8'hAA;//Turquesa oscuro
+assign BOX_H_RGB = 8'h1E;//Turquesa oscuro
 
 //Recuadro FECHA
 assign BOX_F_on = (BOX_F_XL<=pixel_x)&&(pixel_x<=BOX_F_XR)
 						&&(BOX_F_YT<=pixel_y)&&(pixel_y<=BOX_F_YB);
 
-assign BOX_F_RGB = 8'hAA;//Turquesa oscuro
+assign BOX_F_RGB = 8'h1E;//Turquesa oscuro
 
 //Recuadro TIMER
 assign BOX_T_on = (BOX_T_XL<=pixel_x)&&(pixel_x<=BOX_T_XR)
 						&&(BOX_T_YT<=pixel_y)&&(pixel_y<=BOX_T_YB);
 
-assign BOX_T_RGB = 8'hAA;//Turquesa oscuro
+assign BOX_T_RGB = 8'h1E;//Turquesa oscuro
 
 //Multiplexar la salida RGB
 always @*

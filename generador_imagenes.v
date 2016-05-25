@@ -38,16 +38,16 @@ localparam pic_hora_XY = 7'd64;
 //Imagen FECHA
 localparam pic_fecha_XL = 8'd128; //Límite izquierdo
 localparam pic_fecha_XR = 8'd208; //Límite derecho
-localparam pic_fecha_YT = 9'd416;	//Límite superior
-localparam pic_fecha_YB = 9'd448; //Límite inferior
+localparam pic_fecha_YT = 9'd320;	//Límite superior
+localparam pic_fecha_YB = 9'd352; //Límite inferior
 localparam pic_fecha_size = 12'd2560;// (80x32)
 localparam pic_fecha_XY = 6'd32;
 
 //Imagen TIMER
 localparam pic_timer_XL = 9'd416; //Límite izquierdo
 localparam pic_timer_XR = 9'd496; //Límite derecho
-localparam pic_timer_YT = 9'd416;	//Límite superior
-localparam pic_timer_YB = 9'd448; //Límite inferior
+localparam pic_timer_YT = 9'd320;	//Límite superior
+localparam pic_timer_YB = 9'd352; //Límite inferior
 localparam pic_timer_size = 12'd2560;// (80x32)
 localparam pic_timer_XY = 6'd32;
 
@@ -70,6 +70,7 @@ localparam pic_ringball_XY = 6'd48;
 //Imagen LOGO
 localparam pic_logo_XL = 12'd0; //Límite derecho
 localparam pic_logo_XR = 8'd128; //Límite derecho
+localparam pic_logo_YT = 5'd0; //Límite inferior
 localparam pic_logo_YB = 5'd16; //Límite inferior
 localparam pic_logo_size = 12'd2048;// (128x16)
 localparam pic_logo_XY = 5'd16;
@@ -110,7 +111,7 @@ $readmemh ("fecha.list", colour_data_fecha);//Leer datos RBG de archivo de texto
 //Imprime la imagen de hora dentro de la región
 assign pic_fecha_on = (pic_fecha_XL<=pixel_x)&&(pixel_x<=pic_fecha_XR)&&(pic_fecha_YT<=pixel_y)&&(pixel_y<=pic_fecha_YB);//Para saber cuando se está imprimiendo la imagen
 
-assign STATE_fecha = ((pixel_x-pic_fecha_XL)*pic_fecha_XY)+(pixel_y-pic_fecha_YB); //Para generar el índice de la memoria
+assign STATE_fecha = ((pixel_x-pic_fecha_XL)*pic_fecha_XY)+(pixel_y-pic_fecha_YT); //Para generar el índice de la memoria
 
 //===================================================
 // Imagen TIMER
@@ -121,7 +122,7 @@ $readmemh ("timer.list", colour_data_timer);//Leer datos RBG de archivo de texto
 //Imprime la imagen de hora dentro de la región
 assign pic_timer_on = (pic_timer_XL<=pixel_x)&&(pixel_x<=pic_timer_XR)&&(pic_timer_YT<=pixel_y)&&(pixel_y<=pic_timer_YB);//Para saber cuando se está imprimiendo la imagen
 
-assign STATE_timer = ((pixel_x-pic_timer_XL)*pic_timer_XY)+(pixel_y-pic_timer_YB); //Para generar el índice de la memoria
+assign STATE_timer = ((pixel_x-pic_timer_XL)*pic_timer_XY)+(pixel_y-pic_timer_YT); //Para generar el índice de la memoria
 
 //===================================================
 // Imagen RING
@@ -132,7 +133,7 @@ $readmemh ("ring.list", colour_data_ring);//Leer datos RBG de archivo de texto, 
 //Imprime la imagen de hora dentro de la región
 assign pic_ring_on = (pic_ring_XL<=pixel_x)&&(pixel_x<=pic_ring_XR)&&(pic_ring_YT<=pixel_y)&&(pixel_y<=pic_ring_YB);//Para saber cuando se está imprimiendo la imagen
 
-assign STATE_ring = ((pixel_x-pic_ring_XL)*pic_ring_XY)+(pixel_y-pic_ring_YB); //Para generar el índice de la memoria
+assign STATE_ring = ((pixel_x-pic_ring_XL)*pic_ring_XY)+(pixel_y-pic_ring_YT); //Para generar el índice de la memoria
 
 //===================================================
 // Imagen RING BALL
@@ -143,7 +144,7 @@ $readmemh ("ring_ball.list", colour_data_ringball);//Leer datos RBG de archivo d
 //Imprime la imagen de hora dentro de la región
 assign pic_ringball_on = (pic_ringball_XL<=pixel_x)&&(pixel_x<=pic_ringball_XR)&&(pic_ringball_YT<=pixel_y)&&(pixel_y<=pic_ringball_YB);//Para saber cuando se está imprimiendo la imagen
 
-assign STATE_ringball = ((pixel_x-pic_ringball_XL)*pic_ringball_XY)+(pixel_y-pic_ringball_YB); //Para generar el índice de la memoria
+assign STATE_ringball = ((pixel_x-pic_ringball_XL)*pic_ringball_XY)+(pixel_y-pic_ringball_YT); //Para generar el índice de la memoria
 
 //===================================================
 // Imagen LOGO
@@ -154,7 +155,7 @@ $readmemh ("logo.list", colour_data_logo);//Leer datos RBG de archivo de texto, 
 //Imprime la imagen de hora dentro de la región
 assign pic_logo_on = (pixel_x<=pic_logo_XR)&&(pixel_y<=pic_logo_YB);//Para saber cuando se está imprimiendo la imagen
 
-assign STATE_logo = ((pixel_x-pic_logo_XL)*pic_logo_XY)+(pixel_y-pic_logo_YB); //Para generar el índice de la memoria
+assign STATE_logo = ((pixel_x-pic_logo_XL)*pic_logo_XY)+(pixel_y-pic_logo_YT); //Para generar el índice de la memoria
 
 
 //Multiplexa el RGB
