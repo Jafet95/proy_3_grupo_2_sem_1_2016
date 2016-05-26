@@ -123,8 +123,8 @@ begin
 	digit1_SS_T = 4'b0110;
 
 	AM_PM = 1'b0;
-	funcion = 2'b01;
-	cursor_location = 2'b11;
+	funcion = 2'b10;
+	cursor_location = 2'b01;
 	timer_end = 1'b0;
 	formato_hora = 1'b0;
 end
@@ -153,8 +153,8 @@ begin
 	digit1_SS_T = 4'b0001;
 
 	AM_PM = 1'b0;
-	funcion = 2'b10;
-	cursor_location = 2'b01;
+	funcion = 2'b11;
+	cursor_location = 2'b00;
 	timer_end = 1'b0;
 	formato_hora = 1'b0;
 end

@@ -116,7 +116,7 @@ begin
 end
 
 //4.Palabra AM o PM(tamaño de fuente 16x32)
-assign AMPM_on = (pixel_y[9:5]==1)&&(pixel_x[9:4]>=27)&&(pixel_x[9:4]<=28);
+assign AMPM_on = (pixel_y[9:5]==1)&&(pixel_x[9:4]>=26)&&(pixel_x[9:4]<=27);
 assign row_addr_AMPM = pixel_y[4:0];
 assign bit_addr_AMPM = pixel_x[3:0];
 
@@ -128,11 +128,11 @@ begin
 	begin
 	case(AM_PM)//AM_PM = 0: se escribe AM
 	1'b0: char_addr_AMPM = 7'h61;//A
-	1'b1: char_addr_AMPM = 7'h63;//P
+	1'b1: char_addr_AMPM = 7'h64;//P
 	endcase
 	end
 	
-	1'b1: char_addr_AMPM = 7'h64;//M
+	1'b1: char_addr_AMPM = 7'h63;//M
 	endcase	
 end
 
@@ -149,13 +149,13 @@ text_RGB = 8'b0;//Fondo negro
       bit_addr = bit_addr_digHORA;
 			//(0: Los dos dígitos a la derecha, 1: Los dos dígitos intermedios, 2: Los dos dígitos a la izquierda, 3: Ubicación de AM/PM)
 			//Evalúa que se está configurando (0: modo normal, 1: config.hora, 2: config.fecha, 3: config.timer)
-			if(font_bit) text_RGB = 8'h00; //Blanco
-			else if ((parpadeo)&&(~font_bit)&&(config_mode == 1)&&(pixel_y[9:6]==2)&&(pixel_x[9:5]>=6)&&(pixel_x[9:5]<=7)&&(cursor_location==2)) 
-			text_RGB =8'h00;//Hace un cursor si se está en modo configuración
-			else if ((parpadeo)&&(~font_bit)&&(config_mode == 1)&&(pixel_y[9:6]==2)&&(pixel_x[9:5]>=9)&&(pixel_x[9:5]<=10)&&(cursor_location==1))
-			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
-			else if ((parpadeo)&&(~font_bit)&&(config_mode == 1)&&(pixel_y[9:6]==2)&&(pixel_x[9:5]>=12)&&(pixel_x[9:5]<=13)&&(cursor_location==0))
-			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
+			if(font_bit) text_RGB = 8'h00; //Negro
+			else if ((parpadeo)&&(~font_bit)&&(config_mode == 1)&&(pixel_y[9:5]==4)&&(pixel_x[9:4]>=16)&&(pixel_x[9:4]<=17)&&(cursor_location==2)) 
+			text_RGB =8'hFF;//Hace un cursor si se está en modo configuración
+			else if ((parpadeo)&&(~font_bit)&&(config_mode == 1)&&(pixel_y[9:5]==4)&&(pixel_x[9:4]>=19)&&(pixel_x[9:4]<=20)&&(cursor_location==1))
+			text_RGB = 8'hFF;//Hace un cursor si se está en modo configuración
+			else if ((parpadeo)&&(~font_bit)&&(config_mode == 1)&&(pixel_y[9:5]==4)&&(pixel_x[9:4]>=22)&&(pixel_x[9:4]<=23)&&(cursor_location==0))
+			text_RGB = 8'hFF;//Hace un cursor si se está en modo configuración
 			else if(~font_bit) text_RGB = 8'h1E;//Fondo del texto igual al de los recuadros
 		end
 
@@ -165,13 +165,13 @@ text_RGB = 8'b0;//Fondo negro
       row_addr = row_addr_digFECHA;
       bit_addr = bit_addr_digFECHA;
 			//(0: Los dos dígitos a la derecha, 1: Los dos dígitos intermedios, 2: Los dos dígitos a la izquierda, 3: Ubicación de día semana)
-			if(font_bit) text_RGB =8'h00; //Blanco
+			if(font_bit) text_RGB =8'h00; //Negro
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 2)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=7)&&(pixel_x[9:4]<=8)&&(cursor_location==2))
-			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
+			text_RGB = 8'hFF;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 2)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=10)&&(pixel_x[9:4]<=11)&&(cursor_location==1))
-			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
+			text_RGB = 8'hFF;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 2)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=13)&&(pixel_x[9:4]<=14)&&(cursor_location==0))
-			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
+			text_RGB = 8'hFF;//Hace un cursor si se está en modo configuración
 			else if(~font_bit) text_RGB = 8'h1E;//Fondo del texto igual al de los recuadros
 		end
 	
@@ -181,13 +181,13 @@ text_RGB = 8'b0;//Fondo negro
       row_addr = row_addr_digTIMER;
       bit_addr = bit_addr_digTIMER;
 			//(0: Los dos dígitos a la derecha, 1: Los dos dígitos intermedios, 2: Los dos dígitos a la izquierda)
-			if(font_bit) text_RGB = 8'h00; //Blanco
+			if(font_bit) text_RGB = 8'h00; //Negro
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 3)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=25)&&(pixel_x[9:4]<=26)&&(cursor_location==2)) 
-			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
+			text_RGB = 8'hFF;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 3)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=28)&&(pixel_x[9:4]<=29)&&(cursor_location==1))
-			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
+			text_RGB = 8'hFF;//Hace un cursor si se está en modo configuración
 			else if ((parpadeo)&&(~font_bit)&&(config_mode == 3)&&(pixel_y[9:5]==12)&&(pixel_x[9:4]>=31)&&(pixel_x[9:4]<=32)&&(cursor_location==0))
-			text_RGB = 8'h00;//Hace un cursor si se está en modo configuración
+			text_RGB = 8'hFF;//Hace un cursor si se está en modo configuración
 			else if(~font_bit) text_RGB = 8'h1E;//Fondo del texto igual al de los recuadros
 		end
 		

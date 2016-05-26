@@ -156,8 +156,8 @@ begin
 		else if (AMPM_on && formato_hora) RGB_next = text_RGB;
 		else if (graph_on) RGB_next = fig_RGB;
 		else if (pic_on) RGB_next = pic_RGB;
-		else if (pic_ringball_on && estado_alarma && blink) RGB_next = fig_RGB;
-		else if (pic_ring_on && estado_alarma && blink) RGB_next = text_RGB;
+		else if (pic_ringball_on && estado_alarma && blink) RGB_next = pic_RGB;
+		else if (pic_ring_on && estado_alarma && blink) RGB_next = pic_RGB;
 		else RGB_next = 8'h00;//Fondo negro
 end
 

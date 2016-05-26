@@ -139,7 +139,7 @@ assign STATE_ring = ((pixel_x-pic_ring_XL)*pic_ring_XY)+(pixel_y-pic_ring_YT); /
 // Imagen RING BALL
 //===================================================
 initial
-$readmemh ("ring_ball.list", colour_data_ringball);//Leer datos RBG de archivo de texto, sintetiza una ROM
+$readmemh ("ring_ball_2.list", colour_data_ringball);//Leer datos RBG de archivo de texto, sintetiza una ROM
 
 //Imprime la imagen de hora dentro de la región
 assign pic_ringball_on = (pic_ringball_XL<=pixel_x)&&(pixel_x<=pic_ringball_XR)&&(pic_ringball_YT<=pixel_y)&&(pixel_y<=pic_ringball_YB);//Para saber cuando se está imprimiendo la imagen
