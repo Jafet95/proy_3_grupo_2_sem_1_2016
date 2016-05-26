@@ -21,34 +21,44 @@
 module Driver_bus_bidireccional(
 	input in_flag_escritura,//bandera para capturar dato
 	input in_flag_lectura,
+	input in_direccion_dato,
 	input [7:0]in_dato,//Datos de entrada para rtc
-	output reg [7:0]out_dato,//Datos de salida para banco de registros
+	output reg [7:0]out_reg_dato,//Datos de salida para banco de registros
+	input [7:0]addr_RAM,//Dato de direccion para RAM
 	inout tri [7:0]dato //Dato de RTC
-	
     );
  
+reg [7:0]dato_secundario;
+
 //*********************************************************
- reg [7:0]dato_secundario;
+ 
 // ASIGNACION DE BUS DE 3 ESTADOS
 assign dato = (in_flag_escritura)? dato_secundario : 8'bZ;
 
  
 //CONTROLADOR DE SALIDA
-always @(*)begin
-	case({in_flag_escritura,in_flag_lectura})
-		2'b00: begin dato_secundario = 8'd0; // SIN ACCION
-		out_dato = 8'b0;
+always @(*)
+begin
+	case({in_flag_escritura,in_flag_lectura,in_direccion_dato})
+		3'b000: begin dato_secundario = 8'd0; //NO DEBE PASAR
+		out_reg_dato = 8'b0;
 		end
-		2'b01: begin dato_secundario = 8'd0;//LEER DATO
-		out_dato = dato;
+		3'b011: begin dato_secundario = 8'd0;//LEER DATO
+		out_reg_dato = dato;
 		end 
-		2'b10: begin dato_secundario = in_dato;// ESCRIBIR DATO
-		out_dato = 8'd0;
+		3'b100: begin dato_secundario = addr_RAM;// ESCRIBIR DIRECCION RAM
+		out_reg_dato = 8'b0;
 		end 
-		2'b11: begin  dato_secundario = 8'd0;// SIN ACCION
-		out_dato = 8'd0;
-	end
-	endcase	
+		3'b101: begin  dato_secundario = in_dato;// ESCRIBE DATO
+		out_reg_dato = 8'd0;
+		end
+		default: begin
+		dato_secundario = 8'd0; //NO DEBE PASAR
+		out_reg_dato = 8'b0;
+		end
+	
+	endcase
 end
+
 
 endmodule

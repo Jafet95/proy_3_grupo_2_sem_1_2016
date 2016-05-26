@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: 
+// Engineer: Yermy Benavides Solano
 // 
 // Create Date:    22:59:01 05/16/2016 
 // Design Name: 
@@ -288,9 +288,10 @@ end
 			reg_cs = 1'b1;
 			reg_wr = 1'b1;
 			reg_rd = 1'b1;
-			out_direccion_dato = 1'b0;	
+			out_direccion_dato = 1'b0;
+			state_next = espera;
 		end
-		
+		 
 		default: begin 
 		state_next = leer_escribir;
 		reg_a_d = 1'b1;

@@ -1,6 +1,6 @@
 ;ID_PORT direction
-#EQU rtc_address, 0x00 ; 
-#EQU in_rtc_data, 0x01 ;
+#EQU address_rtc, 0x00 ; 
+#EQU in_data_rtc, 0x01 ;
 #EQU teclado, 0x02 ;
 #EQU in_seg_hora, 0x03 ;
 #EQU in_min_hora, 0x04 ;
@@ -14,7 +14,7 @@
 #EQU in_hora_timer, 0x0C ;
 #EQU formato_hora, 0x0D ;
 #EQU estado_alarma, 0x0F ;
-#EQU generador_signal_control, 0x10 ;
+#EQU signal_control_generation, 0x10 ;
 #EQU fin_rtc, 0x11 ;
 #EQU out_rtc_data, 0x12
 #EQU out_seg_hora, 0x13 ;
@@ -27,34 +27,36 @@
 #EQU out_seg_timer, 0x1A ;
 #EQU out_min_timer, 0x1B ;
 #EQU out_hora_timer, 0x1C ;
-
 #EQU address, s0 ; Reg para manejo RTC
 #EQU data, s1;
 #EQU tecla, s2;
 #EQU done, s3;
 inicio:
 	load address, 0x00
-	load in_data_rtc,0x00
+	load data,0x00
 	call escritura
-	load in_data_rtc, 0x01
+	load data, 0x01
 	call escritura
 	load address, 0x10
-	load in_data_rtc, 0xd2
+	load data, 0xd2
+	call escritura
 	jump main
 
 main:
-	WRPRT tecla, teclado ; captura tecla
-	load s4, tecla ; guarda lo q tiene 
-	SUB tecla, 0x68
-	call z configurar_hora
-	load tecla, s4
-	SUB tecla, 0x66
-	call z configurar_fecha
-	load tecla, s4
-	SUB tecla, 0x74
-	call z configurar_timer
+	call lectura_hora_fecha
+	jump main
+	;WRPRT tecla, teclado ; captura tecla
+	;load s4, tecla ; guarda lo q tiene 
+	;SUB tecla, 0x68
+	;call z configurar_hora
+	;load tecla, s4
+	;SUB tecla, 0x66
+	;call z configurar_fecha
+	;load tecla, s4
+	;SUB tecla, 0x74
+	;call z configurar_timer
 	
-configurar_hora:
+;configurar_hora:
 	
 lectura_hora_fecha:
 	load address, 0xF0
@@ -132,20 +134,25 @@ escritura_hora_fecha:
 	RDPRT data, out_dia_semana
 	call escritura
 	ret	
+	
 escritura:
-	WRPRT 0x00, signal_control_generation
+	load s5,0x01
 	WRPRT address, address_rtc
 	WRPRT data, in_data_rtc
+	WRPRT s5, signal_control_generation
 	call wait
 	ret
+	
 lectura:
-	WRPRT 0x01, signal_control_generation
+	load s5,0x00
 	WRPRT address, address_rtc
+	WRPRT s5, signal_control_generation
 	call wait
-	RDPRT dato, out_data_rtc
+	RDPRT data, out_rtc_data
 	ret
+	
 wait:
 	RDPRT done, fin_rtc
-	SUB done, 0x01
-	jump z lectura
+	comp done, 0x01
+	jump nz wait
 	ret
