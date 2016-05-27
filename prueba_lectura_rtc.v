@@ -22,5 +22,6 @@ module prueba_lectura_rtc(
     );
 //Aquí va la instanciación del microcontrolador, el banco de registros y el control con la
 //respectiva interfaz con el PicoBlaze
+//No hace falta el Demux como el proyecto pasado
 
 endmodule

@@ -61,15 +61,8 @@ signal_control_rtc_generator instance_signal_control_rtc_generator (
     .out_direccion_dato(direccion_dato), 
     .flag_done(flag_done)
     );
-reg reg_flag_done,next_flag_done;
-always@(posedge clk) begin
-	reg_flag_done = next_flag_done; 
-end
-always@(*)begin
-	//case({flag_done,read_strobe,port_id == 8'h11})
-		//3'b100: next_flag_done = 1'b1;
-end
-// logica secuencial
+	 
+// Lógica secuencial
 always@(posedge clk , posedge reset) begin
 	if (reset)begin
 		addr_RAM <= 8'h0;
@@ -84,7 +77,7 @@ always@(posedge clk , posedge reset) begin
 	end
 end
 
-// logica combinacional para port_id
+// Lógica combinacional para port_id
 always@* begin
 	if ( write_strobe == 1'b1 || read_strobe == 1'b1) begin
 	// secuencia para sacar el dato recibido del rtc
@@ -95,7 +88,7 @@ always@* begin
 	else en_funcion = 1'b0;
 	
 	case (port_id)
-	8'h00: begin //actualiza direccion
+	8'h00: begin //actualiza dirección
 	reg_addr_RAM = in_dato;
 	reg_dato_escribir = dato_escribir; 
 	reg_escribir_leer = escribir_leer;
@@ -122,6 +115,8 @@ always@* begin
 	reg_addr_RAM = addr_RAM;
 	reg_dato_escribir = dato_escribir;
 	reg_escribir_leer = escribir_leer;
+	out_dato = 8'h00;
+	en_funcion = 1'b0;
 	end
 	
 end

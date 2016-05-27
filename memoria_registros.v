@@ -18,8 +18,9 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module memoria_registros( 
-	input clk, reset, desactivar_alarma, sw2,
+module memoria_registros_VGA
+( 
+	input clk, reset,
 	
 	input cs_seg_hora,cs_min_hora,cs_hora_hora,
 	input cs_dia_fecha,cs_mes_fecha,cs_jahr_fecha,
@@ -29,123 +30,140 @@ module memoria_registros(
 	input hold_dia_fecha,hold_mes_fecha,hold_jahr_fecha,
 	input hold_seg_timer,hold_min_timer,hold_hora_timer,
 	
-	input [7:0]rtc_seg_hora,rtc_min_hora,rtc_hora_hora,
-	input [7:0]rtc_dia_fecha,rtc_mes_fecha,rtc_jahr_fecha,
-	input [7:0]rtc_seg_timer,rtc_min_timer,rtc_hora_timer,
+	input hold_banderas_config,
 	
-	input [7:0]count_seg_hora,count_min_hora,count_hora_hora,
-	input [7:0]count_dia_fecha,count_mes_fecha,count_jahr_fecha,
-	input [7:0]count_seg_timer,count_min_timer,count_hora_timer,
+	input [7:0] data_PicoBlaze,
 	
-	output [7:0]out_seg_hora,out_min_hora,out_hora_hora,
-	output [7:0]out_dia_fecha,out_mes_fecha,out_jahr_fecha,
+	input [7:0] count_seg_hora,count_min_hora,count_hora_hora,
+	input [7:0] count_dia_fecha,count_mes_fecha,count_jahr_fecha,
+	input [7:0] count_seg_timer,count_min_timer,count_hora_timer,
 	
-	output [7:0]out_seg_timer_rtc,out_min_timer_rtc,out_hora_timer_rtc,
-	output [7:0]out_seg_timer_vga,out_min_timer_vga,out_hora_timer_vga,
+	output [7:0] out_seg_hora,out_min_hora,out_hora_hora,
+	output [7:0] out_dia_fecha,out_mes_fecha,out_jahr_fecha,
+	output [7:0] out_seg_timer,out_min_timer,out_hora_timer,
 	
-	output reg estado_alarma,
-	output reg flag_mostrar_count
-    );
+	output[7:0] out_banderas_config
+);
 	 
 //wire flag1,flag2,flag3;
 reg flag_done_timer;
 //assign flag_done_timer = (flag1 && flag2 && flag3)? 1'b1:1'b0;
+wire cs_banderas_config;
 
+assign cs_banderas_config = 1'b0;
  
-////////intancia reg seg_hora
-Registro_Universal instancia_seg_hora (
+////////instancia reg seg_hora
+Registro_Universal #(.N(8))
+instancia_seg_hora (
 	 .hold(hold_seg_hora),
-    .in_rtc_dato(rtc_seg_hora), 
+    .in_rtc_dato(data_PicoBlaze), 
     .in_count_dato(count_seg_hora), 
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_seg_hora), 
     .out_dato(out_seg_hora)
     );
-////////intancia reg min_hora
-Registro_Universal instancia_min_hora (
+////////instancia reg min_hora
+Registro_Universal #(.N(8))
+ instancia_min_hora (
 	 .hold(hold_min_hora),
-    .in_rtc_dato(rtc_min_hora), 
+    .in_rtc_dato(data_PicoBlaze), 
     .in_count_dato(count_min_hora), 
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_min_hora), 
     .out_dato(out_min_hora)
     );
-////////intancia reg hora_hora
-Registro_Universal instancia_hora_hora (
+////////instancia reg hora_hora
+Registro_Universal #(.N(8))
+instancia_hora_hora (
 	 .hold(hold_hora_hora),
-    .in_rtc_dato(rtc_hora_hora), 
+    .in_rtc_dato(data_PicoBlaze), 
     .in_count_dato(count_hora_hora), 
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_hora_hora), 
     .out_dato(out_hora_hora)
     );
-////////intancia reg dia_fecha
-Registro_Universal instancia_dia_fecha (
+////////instancia reg dia_fecha
+Registro_Universal #(.N(8))
+instancia_dia_fecha (
 	 .hold(hold_dia_fecha),
-    .in_rtc_dato(rtc_dia_fecha), 
+    .in_rtc_dato(data_PicoBlaze), 
     .in_count_dato(count_dia_fecha), 
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_dia_fecha), 
     .out_dato(out_dia_fecha)
     );
-////////intancia reg mes_fecha
-Registro_Universal instancia_mes_fecha (
+////////instancia reg mes_fecha
+Registro_Universal #(.N(8))
+instancia_mes_fecha (
 	 .hold(hold_mes_fecha),
-    .in_rtc_dato(rtc_mes_fecha), 
+    .in_rtc_dato(data_PicoBlaze), 
     .in_count_dato(count_mes_fecha), 
     .clk(clk), 
     .reset(reset),  
     .chip_select(cs_mes_fecha), 
     .out_dato(out_mes_fecha)
     );
-////////intancia reg jahr_fecha
-Registro_Universal instancia_jahr_fecha (
+////////instancia reg jahr_fecha
+Registro_Universal #(.N(8))
+instancia_jahr_fecha (
 	 .hold(hold_jahr_fecha),	
-    .in_rtc_dato(rtc_jahr_fecha), 
+    .in_rtc_dato(data_PicoBlaze), 
     .in_count_dato(count_jahr_fecha), 
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_jahr_fecha), 
     .out_dato(out_jahr_fecha)
     );
-////////intancia reg seg_timer
-Registro_timer instancia_seg_timer (
+////////instancia reg seg_timer
+Registro_Universal #(.N(8))
+instancia_seg_timer (
 	 .hold(hold_seg_timer),
-    .in_rtc_dato(rtc_seg_timer), 
+    .in_rtc_dato(data_PicoBlaze), 
     .in_count_dato(count_seg_timer), 
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_seg_timer),
-    .out_dato_vga(out_seg_timer_vga), 
-    .out_dato_rtc(out_seg_timer_rtc)
+    .out_dato(out_seg_timer) 
     );
-////////intancia reg min_timer
-Registro_timer instancia_min_timer (
+////////instancia reg min_timer
+Registro_Universal #(.N(8))
+instancia_min_timer (
 	 .hold(hold_min_timer),
-    .in_rtc_dato(rtc_min_timer), 
+    .in_rtc_dato(data_PicoBlaze), 
     .in_count_dato(count_min_timer), 
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_min_timer), 
-    .out_dato_vga(out_min_timer_vga), 
-    .out_dato_rtc(out_min_timer_rtc)
+    .out_dato(out_min_timer)
     );
-////////intancia reg hora_timer
-Registro_timer instancia_hora_timer(
+////////instancia reg hora_timer
+Registro_Universal #(.N(8))
+instancia_hora_timer(
 	 .hold(hold_hora_timer),
-    .in_rtc_dato(rtc_hora_timer), 
+    .in_rtc_dato(data_PicoBlaze), 
     .in_count_dato(count_hora_timer), 
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_hora_timer),
-    .out_dato_vga(out_hora_timer_vga), 
-    .out_dato_rtc(out_hora_timer_rtc)
+    .out_dato(out_hora_timer)
+    );
+////////instancia reg banderas_config
+Registro_Universal #(.N(8))
+instancia_bandera_config(
+	 .hold(hold_banderas_config),
+    .in_rtc_dato(data_PicoBlaze), 
+    .in_count_dato(8'b0), 
+    .clk(clk), 
+    .reset(reset), 
+    .chip_select(cs_banderas_config),
+    .out_dato(out_banderas_config)
     );
 
+/*
 //Para generar flag_done_timer
 always@(posedge clk)
 begin
@@ -203,5 +221,5 @@ endcase
 end
 
 /////////////////////////////////////////
-
+*/
 endmodule 

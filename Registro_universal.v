@@ -19,18 +19,18 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module Registro_Universal
-
-	(
-		input wire hold,
-		input wire [7:0]in_rtc_dato,
-		input wire [7:0]in_count_dato,
-		input wire clk, //system clock
-		input wire reset, //system reset
-		input wire chip_select, //Control data
-		output wire [7:0]out_dato
-    );
-reg [7:0]reg_dato;
-reg [7:0]next_dato;
+#(parameter N = 8) //Número de bits y código de decodificado para habilitar el registro
+(
+	input wire hold,
+	input wire [N-1:0]in_rtc_dato,
+	input wire [N-1:0]in_count_dato,
+	input wire clk, //system clock
+	input wire reset, //system reset
+	input wire chip_select, //Control data
+	output wire [N-1:0]out_dato
+);
+reg [N-1:0]reg_dato;
+reg [N-1:0]next_dato;
 
 //Secuencial
 always@(negedge clk, posedge reset)
