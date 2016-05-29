@@ -94,7 +94,7 @@ reg [7:0] pic_RGB_aux;
 //===================================================
 // Imagen HORA
 //===================================================
-initial
+initial 
 $readmemh ("hora.list", colour_data_hora);
 
 //Imprime la imagen de hora dentro de la región

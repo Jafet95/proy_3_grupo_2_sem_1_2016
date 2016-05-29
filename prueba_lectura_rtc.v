@@ -23,14 +23,18 @@ module prueba_lectura_rtc
 input wire clk, reset,
 inout [7:0]dato,
 output wire AD, CS, WR, RD,
+output [7:0]port_id,out_port,wire_in_port,
+output reg[7:0]fin_lectura_escritura,
+output hold_seg_hora,
 output [7:0] RGB,
 output hsync, vsync
-);
+); 
 
 //Conexiones internas
 reg [7:0]in_port;
-wire [7:0]out_port;
-wire [7:0]port_id;
+assign wire_in_port = in_port;
+//wire [7:0]out_port;
+//wire [7:0]port_id;
 wire write_strobe;
 wire k_write_strobe;
 wire read_strobe;
@@ -41,7 +45,7 @@ wire [7:0]out_dia_fecha,out_mes_fecha,out_jahr_fecha,out_dia_semana;
 wire [7:0]out_seg_timer,out_min_timer,out_hora_timer;
 
 //////////////////////////// hold's
-wire hold_seg_hora; 
+//wire hold_seg_hora; 
 wire hold_min_hora; 
 wire hold_hora_hora; 
 wire hold_dia_fecha; 
@@ -56,7 +60,7 @@ wire hold_hora_timer;
 
 
 wire flag_done;
-reg [7:0]fin_lectura_escritura;
+//reg [7:0]fin_lectura_escritura;
 wire [7:0]wire_out_dato;
 
 reg state_reg_flag,state_next_flag;
@@ -165,7 +169,7 @@ escritor_lector_rtc instancia_escritor_lector_rtc (
     .reg_rd(RD), 
     .reg_wr(WR), 
     .out_dato(wire_out_dato), 
-    .fin_lectura_escritura(flag_done), 
+    .flag_done(flag_done), 
     .dato(dato)
     );
 

@@ -23,17 +23,17 @@ module escritor_lector_rtc(
 	input [7:0]port_id,in_dato,
 	input write_strobe,read_strobe,
 	output reg_a_d,reg_cs,reg_rd,reg_wr,
-	output wire[7:0]out_dato,
-	output fin_lectura_escritura,
+	output reg[7:0]out_dato,
+	output flag_done,
 	inout [7:0]dato
 	
     );
  
-wire flag_done;
-assign fin_lectura_escritura = flag_done;
+
 reg en_funcion;
 reg [7:0]addr_RAM,dato_escribir;
 wire [7:0]dato_leido;
+reg [7:0]next_out_dato;
 reg [7:0]reg_addr_RAM, reg_dato_escribir,reg_dato_leido;
 reg reg_escribir_leer,escribir_leer;
 wire direccion_dato;
@@ -43,7 +43,7 @@ Driver_bus_bidireccional instance_driver_bus_bidireccional (
     .in_flag_lectura(~reg_rd), 
     .in_direccion_dato(direccion_dato), 
     .in_dato(dato_escribir), 
-    .out_reg_dato(out_dato),  
+    .out_reg_dato(dato_leido),  
     .addr_RAM(addr_RAM), 
     .dato(dato)
     );
@@ -62,23 +62,31 @@ signal_control_rtc_generator instance_signal_control_rtc_generator (
     .flag_done(flag_done)
     );
 
+
+
 // logica secuencial
-always@(posedge clk , posedge reset) begin
+always@(negedge clk , posedge reset) begin
 	if (reset)begin
 		addr_RAM <= 8'h0;
 		dato_escribir <= 8'h0;
 		escribir_leer <= 1'b0;
+		out_dato <= 8'b0;
 	end
 	else begin
 		addr_RAM <= reg_addr_RAM;
 		dato_escribir <= reg_dato_escribir;
 		escribir_leer <= reg_escribir_leer;
+		out_dato <= next_out_dato;
 		
 	end
 end
 
 // logica combinacional para port_id
 always@* begin
+
+	if (~reg_rd) next_out_dato = dato_leido;
+	next_out_dato = out_dato;
+	
 	if ( write_strobe == 1'b1 || read_strobe == 1'b1) begin
 	// inicio de secuencia de lectura_escritura rtc
 	if(port_id == 8'h0E) en_funcion = 1'b1;

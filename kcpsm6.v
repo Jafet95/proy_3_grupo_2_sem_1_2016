@@ -1017,7 +1017,7 @@ move_type_lut(
 	.I3     (instruction[15]),
 	.I4     (instruction[16]),
 	.I5     (1'b1),
-	.O5     (returni_type),
+	.O5     (returni_type), 
 	.O6     (move_type)) ;
 
 (* HBLKNM = "kcpsm6_vector1" *)
