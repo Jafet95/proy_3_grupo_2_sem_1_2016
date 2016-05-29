@@ -95,14 +95,14 @@ escritor_lector_rtc instance_escritor_lector_rtc (
  always @ (posedge clk)
   begin
       case (port_id) 
-			8'h11 : in_port <= fin_lectura_escritura;
-			8'h12 : in_port <= out_dato;
+			8'h0F : in_port <= fin_lectura_escritura;
+			8'h10 : in_port <= out_dato;
         default : in_port <= 8'bXXXXXXXX ;  
       endcase
   end
   
 /// maquina de estados para manipular fin lectura escritura
-always @ (posedge clk,posedge reset) begin 
+always @ (negedge clk,posedge reset) begin 
 	if (reset) state_reg_flag = 1'b0;
 	else state_reg_flag = state_next_flag;
 end
@@ -117,7 +117,7 @@ state_next_flag = state_reg_flag;
 		end
 	1'b1: begin
 		fin_lectura_escritura = 8'h01;
-		if(port_id == 8'h11 && write_strobe == 1)  state_next_flag = 1'b0;
+		if(port_id == 8'h0F && read_strobe == 1)  state_next_flag = 1'b0;
 		else  state_next_flag = 1'b1; 		
 	end
 	endcase

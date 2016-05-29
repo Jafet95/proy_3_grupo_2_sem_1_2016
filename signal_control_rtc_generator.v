@@ -134,8 +134,22 @@ end
 			reg_wr = 1'b0;
 			reg_rd = 1'b1;
 			out_direccion_dato = 1'b0;
-		end
+			end
 		5'd5: begin
+			reg_a_d = 1'b0;
+			reg_cs = 1'b0;
+			reg_wr = 1'b0;
+			reg_rd = 1'b1;
+			out_direccion_dato = 1'b0;
+			end
+		5'd6: begin
+			reg_a_d = 1'b0;
+			reg_cs = 1'b0;
+			reg_wr = 1'b0;
+			reg_rd = 1'b1;
+			out_direccion_dato = 1'b0;
+		end
+		5'd7: begin
 			reg_a_d = 1'b0;
 			reg_cs = 1'b0;
 			reg_wr = 1'b0;
@@ -143,7 +157,7 @@ end
 			out_direccion_dato = 1'b0;
 		end
 		
-		5'd6: begin
+		5'd8: begin
 			reg_a_d = 1'b0;
 			reg_cs = 1'b0;
 			reg_wr = 1'b0;
@@ -151,22 +165,8 @@ end
 			out_direccion_dato = 1'b0;
 			end
 			
-		5'd7:begin 
+		5'd9:begin 
 			reg_a_d = 1'b0;
-			reg_cs = 1'b1;
-			reg_wr = 1'b1;
-			reg_rd = 1'b1;
-			out_direccion_dato = 1'b0;
-		end
-		5'd8: begin
-			reg_a_d = 1'b1;
-			reg_cs = 1'b1;
-			reg_wr = 1'b1;
-			reg_rd = 1'b1;
-			out_direccion_dato = 1'b0;
-		end
-		5'd9: begin
-			reg_a_d = 1'b1;
 			reg_cs = 1'b1;
 			reg_wr = 1'b1;
 			reg_rd = 1'b1;
@@ -185,7 +185,7 @@ end
 			reg_wr = 1'b1;
 			reg_rd = 1'b1;
 			out_direccion_dato = 1'b0;
-			end
+		end
 		5'd12: begin
 			reg_a_d = 1'b1;
 			reg_cs = 1'b1;
@@ -195,19 +195,19 @@ end
 		end
 		5'd13: begin
 			reg_a_d = 1'b1;
-			out_direccion_dato = 1'b1;
-			if (in_escribir_leer)begin
-			reg_cs = 1'b0;
-			reg_wr = 1'b0;
-			reg_rd = 1'b1;
-			end
-			else begin
-			reg_cs = 1'b0;
+			reg_cs = 1'b1;
 			reg_wr = 1'b1;
-			reg_rd = 1'b0;
+			reg_rd = 1'b1;
+			out_direccion_dato = 1'b0;
+			end
+		5'd14: begin
+			reg_a_d = 1'b1;
+			reg_cs = 1'b1;
+			reg_wr = 1'b1;
+			reg_rd = 1'b1;
+			out_direccion_dato = 1'b0;
 		end
-		end
-		5'd14:begin
+		5'd15: begin
 			reg_a_d = 1'b1;
 			out_direccion_dato = 1'b1;
 			if (in_escribir_leer)begin
@@ -221,21 +221,7 @@ end
 			reg_rd = 1'b0;
 		end
 		end
-		5'd15:begin
-			reg_a_d = 1'b1;
-			out_direccion_dato = 1'b1;
-			if (in_escribir_leer)begin
-			reg_cs = 1'b0;
-			reg_wr = 1'b0;
-			reg_rd = 1'b1;
-			end
-			else begin
-			reg_cs = 1'b0;
-			reg_wr = 1'b1;
-			reg_rd = 1'b0;
-			end
-		end
-		5'd16: begin
+		5'd16:begin
 			reg_a_d = 1'b1;
 			out_direccion_dato = 1'b1;
 			if (in_escribir_leer)begin
@@ -249,7 +235,35 @@ end
 			reg_rd = 1'b0;
 		end
 		end
-		5'd17: begin
+		5'd17:begin
+			reg_a_d = 1'b1;
+			out_direccion_dato = 1'b1;
+			if (in_escribir_leer)begin
+			reg_cs = 1'b0;
+			reg_wr = 1'b0;
+			reg_rd = 1'b1;
+			end
+			else begin
+			reg_cs = 1'b0;
+			reg_wr = 1'b1;
+			reg_rd = 1'b0;
+			end
+		end
+		5'd18:begin
+			reg_a_d = 1'b1;
+			out_direccion_dato = 1'b1;
+			if (in_escribir_leer)begin
+			reg_cs = 1'b0;
+			reg_wr = 1'b0;
+			reg_rd = 1'b1;
+			end
+			else begin
+			reg_cs = 1'b0;
+			reg_wr = 1'b1;
+			reg_rd = 1'b0;
+			end
+		end
+		5'd19: begin
 			reg_a_d = 1'b1;
 			out_direccion_dato = 1'b1;
 			if (in_escribir_leer)begin
@@ -263,7 +277,21 @@ end
 			reg_rd = 1'b0;
 		end
 		end
-		5'd18: begin
+		5'd20: begin
+			reg_a_d = 1'b1;
+			out_direccion_dato = 1'b1;
+			if (in_escribir_leer)begin
+			reg_cs = 1'b0;
+			reg_wr = 1'b0;
+			reg_rd = 1'b1;
+			end
+			else begin
+			reg_cs = 1'b0;
+			reg_wr = 1'b1;
+			reg_rd = 1'b0;
+		end
+		end
+		5'd21: begin
 			reg_a_d = 1'b1;
 			out_direccion_dato = 1'b1;
 			if (in_escribir_leer)begin
@@ -277,17 +305,17 @@ end
 			reg_rd = 1'b0;
 		end end
 		
-		5'd19: begin reg_a_d = 1'b1;
+		5'd22: begin reg_a_d = 1'b1;
 			reg_cs = 1'b1;
 			reg_wr = 1'b1;
 			reg_rd = 1'b1;
 			out_direccion_dato = 1'b1;
 			end
-		5'd20:
+		5'd23:
 		begin reg_a_d = 1'b1;
 			reg_cs = 1'b1;
 			reg_wr = 1'b1;
-			reg_rd = 1'b1;
+			reg_rd = 1'b1; 
 			out_direccion_dato = 1'b0;
 			state_next = espera;
 		end
