@@ -18,10 +18,13 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module escritor_lector_rtc
+module escritor_lector_rtc_2
 (
 	input wire clk,reset,
 	input wire [7:0] in_dato,
+	input wire [7:0] addr_RAM,
+	input escribir_leer,
+	input wire en_funcion,
 	output wire reg_a_d,reg_cs,reg_rd,reg_wr,
 	output wire[7:0]out_dato,
 	output wire fin_lectura_escritura,
@@ -38,14 +41,16 @@ reg reg_escribir_leer,escribir_leer;
 */
 wire direccion_dato;
 
+
 /// I/O Datos
 Driver_bus_bidireccional instance_driver_bus_bidireccional (
+	 .clk(clk),
     .in_flag_escritura(~reg_wr), 
     .in_flag_lectura(~reg_rd), 
     .in_direccion_dato(direccion_dato), //bandera para saber si se debe escribir direccion/dato
     .in_dato(in_dato), 
     .out_reg_dato(out_dato),  
-    .addr_RAM(in_dato), 
+    .addr_RAM(addr_RAM), 
     .dato(dato)
     );
 
@@ -53,9 +58,9 @@ Driver_bus_bidireccional instance_driver_bus_bidireccional (
 signal_control_rtc_generator instance_signal_control_rtc_generator (
     .clk(clk), 
     .reset(reset), 
-    .in_escribir_leer(in_dato[0]), 
-    .en_funcion(in_dato[1]), //¿Por qué este bit no lo manda mediante el in_dato proveniente del micro en la misma instrucción
-    .reg_a_d(reg_a_d), 		// que manda in_escribir_leer? (.en_funcion(en_funcion))
+    .in_escribir_leer(escribir_leer), 
+    .en_funcion(en_funcion),
+    .reg_a_d(reg_a_d), 		
     .reg_cs(reg_cs), 
     .reg_wr(reg_wr), 
     .reg_rd(reg_rd), 

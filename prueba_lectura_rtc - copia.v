@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module prueba_lectura_rtc
+module prueba_lectura_rtc_2
 (
 input wire clk, reset,
 inout [7:0]dato,
@@ -54,11 +54,13 @@ wire hold_hora_timer;
 // wire hold_banderas_config;
 //////////////////////
 
+//Registros para el controlador RTC
+reg [7:0]in_dato, addr_RAM;
+reg en_funcion,escribir_leer;
 
-wire flag_done;
-reg [7:0]fin_lectura_escritura;
-wire [7:0]wire_out_dato;
-wire wire_flag_done;
+wire fin_lectura_escritura;
+reg [7:0]flag_done;
+wire [7:0]out_dato;
 
 reg state_reg_flag,state_next_flag;
 
@@ -93,6 +95,20 @@ controlador_VGA instancia_controlador_VGA
     .hsync(hsync), 
     .vsync(vsync), 
     .RGB(RGB)
+    );
+	 
+deco_hold_registros instancia_deco_hold_registros (
+    .write_strobe(write_strobe), 
+    .port_id(port_id), 
+    .hold_seg_hora(hold_seg_hora), 
+    .hold_min_hora(hold_min_hora), 
+    .hold_hora_hora(hold_hora_hora), 
+    .hold_dia_fecha(hold_dia_fecha), 
+    .hold_mes_fecha(hold_mes_fecha), 
+    .hold_jahr_fecha(hold_jahr_fecha), 
+    .hold_seg_timer(hold_seg_timer), 
+    .hold_min_timer(hold_min_timer), 
+    .hold_hora_timer(hold_hora_timer)
     );
 
 memoria_registros_VGA instancia_memoria_registros_VGA 
@@ -140,72 +156,84 @@ memoria_registros_VGA instancia_memoria_registros_VGA
     .out_banderas_config()
 );
 
-escritor_lector_rtc instancia_escritor_lector_rtc (
+escritor_lector_rtc_2 instancia_escritor_lector_rtc_2 (
     .clk(clk), 
-    .reset(reset), 
-    .port_id(port_id), 
-    .in_dato(out_port), 
-    .write_strobe(write_strobe), 
-    .read_strobe(read_strobe), 
+    .reset(reset),
+	 .en_funcion(en_funcion),	 
+    .in_dato(in_dato),
+	 .addr_RAM(addr_RAM),
+	 .escribir_leer(escribir_leer),
     .reg_a_d(AD), 
     .reg_cs(CS), 
     .reg_rd(RD), 
     .reg_wr(WR), 
-    .out_dato(wire_out_dato), 
-    .fin_lectura_escritura(flag_done), 
+    .out_dato(out_dato), 
+    .fin_lectura_escritura(fin_lectura_escritura), 
     .dato(dato)
     );
+
+//Para habilitar el generador de señales	 
+always@(posedge clk)
+begin
+	if(port_id == 8'h0E) en_funcion = 1'b1;
+	else en_funcion = 1'b0;
+end
 	 
 //Decodificación del puerto de entrada del microcontrolador
 
-always @ (posedge clk)
+always@(posedge clk)
 begin
 	case (port_id) 
-		8'h0F : in_port <= wire_flag_done;
-		8'h10 : in_port <= wire_out_dato;
-	  default : in_port <= 8'bXXXXXXXX ;  
+		8'h0F : in_port <= flag_done;
+		8'h10 : in_port <= out_dato;
+	  default : in_port <= 8'bXXXXXXXX;  
 	endcase
 end
 
 //Decodificación del puerto de salida del microcontrolador
+
+always@(posedge clk)
+begin
+	if (write_strobe == 1'b1)
+	
+		if(port_id == 8'h00)
+		begin
+			addr_RAM <= out_port;
+		end
+		
+		if(port_id == 8'h01)
+		begin
+			in_dato <= out_port;
+		end
+		
+		if(port_id == 8'h0E)
+		begin
+			escribir_leer <= out_port[0];
+		end
+end
 	 
 /// maquina de estados para manipular fin lectura escritura
-always @ (negedge clk,posedge reset) begin 
+always @ (negedge clk, posedge reset) begin 
 	if (reset) state_reg_flag = 1'b0;
 	else state_reg_flag = state_next_flag;
 end
 
-always@ (*) begin
+always@* 
+begin
 state_next_flag = state_reg_flag;
 	case (state_reg_flag)
 	1'b0: begin
-		fin_lectura_escritura = 8'h00;
-		if (flag_done == 1) state_next_flag = 1'b1;
+		flag_done = 8'h00;
+		if (fin_lectura_escritura == 1) state_next_flag = 1'b1;
 		else state_next_flag = 1'b0;
 		end
 	1'b1: begin
-		fin_lectura_escritura = 8'h01;
-		if(port_id == 8'h0F && read_strobe == 1)  state_next_flag = 1'b0;
+		flag_done = 8'h01;
+		if(port_id == 8'h0F && read_strobe == 1)  state_next_flag = 1'b0;//Cuando el micro lee el dato se baja la bandera
 		else  state_next_flag = 1'b1; 		
 	end
 	endcase
 end
-
-assign wire_flag_done = state_reg_flag;
 	 
-/*
-deco_hold_registros instancia_deco_hold_registros (
-    .write_strobe(write_strobe), 
-    .port_id(port_id), 
-    .hold_seg_hora(hold_seg_hora), 
-    .hold_min_hora(hold_min_hora), 
-    .hold_hora_hora(hold_hora_hora), 
-    .hold_dia_fecha(hold_dia_fecha), 
-    .hold_mes_fecha(hold_mes_fecha), 
-    .hold_jahr_fecha(hold_jahr_fecha), 
-    .hold_seg_timer(hold_seg_timer), 
-    .hold_min_timer(hold_min_timer), 
-    .hold_hora_timer(hold_hora_timer)
-    );
-*/
+
 endmodule
