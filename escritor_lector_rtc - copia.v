@@ -18,33 +18,34 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module escritor_lector_rtc(
-	input clk,reset,
-	input [7:0]port_id,in_dato,
-	input write_strobe,read_strobe,
-	output reg_a_d,reg_cs,reg_rd,reg_wr,
-	output reg[7:0]out_dato,
-	output flag_done,
+module escritor_lector_rtc
+(
+	input wire clk,reset,
+	input wire [7:0] in_dato,
+	output wire reg_a_d,reg_cs,reg_rd,reg_wr,
+	output wire[7:0]out_dato,
+	output wire fin_lectura_escritura,
 	inout [7:0]dato
-	
-    );
+);
  
-
+/*wire flag_done;
+assign fin_lectura_escritura = flag_done;
 reg en_funcion;
 reg [7:0]addr_RAM,dato_escribir;
 wire [7:0]dato_leido;
-reg [7:0]next_out_dato;
 reg [7:0]reg_addr_RAM, reg_dato_escribir,reg_dato_leido;
 reg reg_escribir_leer,escribir_leer;
+*/
 wire direccion_dato;
+
 /// I/O Datos
 Driver_bus_bidireccional instance_driver_bus_bidireccional (
     .in_flag_escritura(~reg_wr), 
     .in_flag_lectura(~reg_rd), 
-    .in_direccion_dato(direccion_dato), 
-    .in_dato(dato_escribir), 
-    .out_reg_dato(dato_leido),  
-    .addr_RAM(addr_RAM), 
+    .in_direccion_dato(direccion_dato), //bandera para saber si se debe escribir direccion/dato
+    .in_dato(in_dato), 
+    .out_reg_dato(out_dato),  
+    .addr_RAM(in_dato), 
     .dato(dato)
     );
 
@@ -52,40 +53,33 @@ Driver_bus_bidireccional instance_driver_bus_bidireccional (
 signal_control_rtc_generator instance_signal_control_rtc_generator (
     .clk(clk), 
     .reset(reset), 
-    .in_escribir_leer(escribir_leer), 
-    .en_funcion(en_funcion), 
-    .reg_a_d(reg_a_d), 
+    .in_escribir_leer(in_dato[0]), 
+    .en_funcion(in_dato[1]), //¿Por qué este bit no lo manda mediante el in_dato proveniente del micro en la misma instrucción
+    .reg_a_d(reg_a_d), 		// que manda in_escribir_leer? (.en_funcion(en_funcion))
     .reg_cs(reg_cs), 
     .reg_wr(reg_wr), 
     .reg_rd(reg_rd), 
     .out_direccion_dato(direccion_dato), 
-    .flag_done(flag_done)
+    .flag_done(fin_lectura_escritura)
     );
 
-
-
-// logica secuencial
-always@(negedge clk , posedge reset) begin
+/*// logica secuencial
+always@(posedge clk , posedge reset) begin
 	if (reset)begin
 		addr_RAM <= 8'h0;
 		dato_escribir <= 8'h0;
 		escribir_leer <= 1'b0;
-		out_dato <= 8'b0;
 	end
 	else begin
 		addr_RAM <= reg_addr_RAM;
 		dato_escribir <= reg_dato_escribir;
 		escribir_leer <= reg_escribir_leer;
-		out_dato <= next_out_dato;
 		
 	end
 end
 
 // logica combinacional para port_id
 always@* begin
-
-	if (~reg_rd) next_out_dato = dato_leido;
-	else next_out_dato = out_dato;
 	if ( write_strobe == 1'b1 || read_strobe == 1'b1) begin
 	// inicio de secuencia de lectura_escritura rtc
 	if(port_id == 8'h0E) en_funcion = 1'b1;
@@ -123,6 +117,6 @@ always@* begin
 	end
 	
 end
-
+*/
 
 endmodule

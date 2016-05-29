@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date:    13:49:19 05/27/2016 
+// Create Date:    20:14:45 05/28/2016 
 // Design Name: 
-// Module Name:    prueba_lectura_rtc 
+// Module Name:    prueba_lector_rtc_7_seg 
 // Project Name: 
 // Target Devices: 
 // Tool versions: 
@@ -18,34 +18,33 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module prueba_lectura_rtc
-(
-input wire clk, reset,
+module prueba_lector_rtc_7_seg(
+
+input wire clk, reset, sw,
 inout [7:0]dato,
 output wire AD, CS, WR, RD,
-output [7:0]port_id,out_port,wire_in_port,
-output reg[7:0]fin_lectura_escritura,
-output hold_seg_hora,
-output [7:0] RGB,
-output hsync, vsync
-); 
+output [7:0] code_digitos_decimal,
+output [3:0] code_7seg
+//output [7:0] RGB,
+//output hsync, vsync
+);
 
 //Conexiones internas
 reg [7:0]in_port;
-assign wire_in_port = in_port;
-//wire [7:0]out_port;
-//wire [7:0]port_id;
+wire [7:0]out_port;
+wire [7:0]port_id;
 wire write_strobe;
 wire k_write_strobe;
 wire read_strobe;
 wire interrupt;
-// conexiones banco de registros a VGA
+// conexiones banco de registros a VGA 
+
 wire [7:0]out_seg_hora,out_min_hora,out_hora_hora;
 wire [7:0]out_dia_fecha,out_mes_fecha,out_jahr_fecha,out_dia_semana;
 wire [7:0]out_seg_timer,out_min_timer,out_hora_timer;
 
 //////////////////////////// hold's
-//wire hold_seg_hora; 
+wire hold_seg_hora; 
 wire hold_min_hora; 
 wire hold_hora_hora; 
 wire hold_dia_fecha; 
@@ -60,7 +59,7 @@ wire hold_hora_timer;
 
 
 wire flag_done;
-//reg [7:0]fin_lectura_escritura;
+reg [7:0]fin_lectura_escritura;
 wire [7:0]wire_out_dato;
 
 reg state_reg_flag,state_next_flag;
@@ -80,7 +79,7 @@ microcontrolador instancia_microcontrolador
     .port_id(port_id), 
     .out_port(out_port)
 );
-
+/*
 controlador_VGA instancia_controlador_VGA 
 (
     .clock(clk), 
@@ -97,7 +96,7 @@ controlador_VGA instancia_controlador_VGA
     .vsync(vsync), 
     .RGB(RGB)
     );
-
+*/
 memoria_registros_VGA instancia_memoria_registros_VGA 
 (
     .clk(clk), 
@@ -127,7 +126,7 @@ memoria_registros_VGA instancia_memoria_registros_VGA
     .count_hora_hora(8'b0), 
     .count_dia_fecha(8'b0), 
     .count_mes_fecha(8'b0), 
-    .count_jahr_fecha(8'b0), 
+    .count_jahr_fecha(8'b0),   
     .count_seg_timer(8'b0), 
     .count_min_timer(8'b0), 
     .count_hora_timer(8'b0), 
@@ -172,9 +171,10 @@ escritor_lector_rtc instancia_escritor_lector_rtc (
     .flag_done(flag_done), 
     .dato(dato)
     );
-
- always @ (posedge clk)
-  begin
+reg [7:0]reg_seg,next_seg;
+reg [7:0]valor;
+ always @ (posedge clk)   begin
+	reg_seg = next_seg;
       case (port_id) 
 			8'h0F : in_port <= fin_lectura_escritura;
 			8'h10 : in_port <= wire_out_dato;
@@ -189,6 +189,11 @@ always @ (negedge clk,posedge reset) begin
 end
 
 always@ (*) begin
+	if (sw) valor = 8'hAA;
+	else valor = 8'h2C;
+	if (port_id == 8'h03 && write_strobe == 1 ) next_seg = out_port;
+	else	next_seg = reg_seg;
+	
 state_next_flag = state_reg_flag;
 	case (state_reg_flag)
 	1'b0: begin
@@ -203,7 +208,21 @@ state_next_flag = state_reg_flag;
 	end
 	endcase
 end
+
+	 disp_hex_mux instancia_disp_hex_mux (
+    .clk(clk), 
+    .reset(reset), 
+    .hex3(valor[7:4]), 
+    .hex2(valor[3:0]), 
+    .hex1(reg_seg[7:4]), 
+    .hex0(reg_seg[3:0]), 
+    .dp_in(), 
+    .an(code_7seg), 
+    .sseg(code_digitos_decimal)
+    );
+
+
 	 
-	 
+ 
 
 endmodule

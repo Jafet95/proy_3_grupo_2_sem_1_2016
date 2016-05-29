@@ -64,7 +64,7 @@ end
 
 
 // Pulso de salida
-assign flag_done = (q_reg == 20) ? 1'b1 : 1'b0;//Tbandera fin de proseso
+assign flag_done = (q_reg == 23) ? 1'b1 : 1'b0;//Tbandera fin de proseso
 
  
 ///logica secuencial

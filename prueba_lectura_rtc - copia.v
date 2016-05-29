@@ -23,18 +23,14 @@ module prueba_lectura_rtc
 input wire clk, reset,
 inout [7:0]dato,
 output wire AD, CS, WR, RD,
-output [7:0]port_id,out_port,wire_in_port,
-output reg[7:0]fin_lectura_escritura,
-output hold_seg_hora,
 output [7:0] RGB,
 output hsync, vsync
-); 
+);
 
 //Conexiones internas
 reg [7:0]in_port;
-assign wire_in_port = in_port;
-//wire [7:0]out_port;
-//wire [7:0]port_id;
+wire [7:0]out_port;
+wire [7:0]port_id;
 wire write_strobe;
 wire k_write_strobe;
 wire read_strobe;
@@ -45,7 +41,7 @@ wire [7:0]out_dia_fecha,out_mes_fecha,out_jahr_fecha,out_dia_semana;
 wire [7:0]out_seg_timer,out_min_timer,out_hora_timer;
 
 //////////////////////////// hold's
-//wire hold_seg_hora; 
+wire hold_seg_hora; 
 wire hold_min_hora; 
 wire hold_hora_hora; 
 wire hold_dia_fecha; 
@@ -60,8 +56,9 @@ wire hold_hora_timer;
 
 
 wire flag_done;
-//reg [7:0]fin_lectura_escritura;
+reg [7:0]fin_lectura_escritura;
 wire [7:0]wire_out_dato;
+wire wire_flag_done;
 
 reg state_reg_flag,state_next_flag;
 
@@ -143,20 +140,6 @@ memoria_registros_VGA instancia_memoria_registros_VGA
     .out_banderas_config()
 );
 
-deco_hold_registros instancia_deco_hold_registros (
-    .write_strobe(write_strobe), 
-    .port_id(port_id), 
-    .hold_seg_hora(hold_seg_hora), 
-    .hold_min_hora(hold_min_hora), 
-    .hold_hora_hora(hold_hora_hora), 
-    .hold_dia_fecha(hold_dia_fecha), 
-    .hold_mes_fecha(hold_mes_fecha), 
-    .hold_jahr_fecha(hold_jahr_fecha), 
-    .hold_seg_timer(hold_seg_timer), 
-    .hold_min_timer(hold_min_timer), 
-    .hold_hora_timer(hold_hora_timer)
-    );
-	 
 escritor_lector_rtc instancia_escritor_lector_rtc (
     .clk(clk), 
     .reset(reset), 
@@ -169,19 +152,23 @@ escritor_lector_rtc instancia_escritor_lector_rtc (
     .reg_rd(RD), 
     .reg_wr(WR), 
     .out_dato(wire_out_dato), 
-    .flag_done(flag_done), 
+    .fin_lectura_escritura(flag_done), 
     .dato(dato)
     );
+	 
+//Decodificación del puerto de entrada del microcontrolador
 
- always @ (posedge clk)
-  begin
-      case (port_id) 
-			8'h0F : in_port <= fin_lectura_escritura;
-			8'h10 : in_port <= wire_out_dato;
-        default : in_port <= 8'bXXXXXXXX ;  
-      endcase
-  end
-  
+always @ (posedge clk)
+begin
+	case (port_id) 
+		8'h0F : in_port <= wire_flag_done;
+		8'h10 : in_port <= wire_out_dato;
+	  default : in_port <= 8'bXXXXXXXX ;  
+	endcase
+end
+
+//Decodificación del puerto de salida del microcontrolador
+	 
 /// maquina de estados para manipular fin lectura escritura
 always @ (negedge clk,posedge reset) begin 
 	if (reset) state_reg_flag = 1'b0;
@@ -203,7 +190,22 @@ state_next_flag = state_reg_flag;
 	end
 	endcase
 end
-	 
-	 
 
+assign wire_flag_done = state_reg_flag;
+	 
+/*
+deco_hold_registros instancia_deco_hold_registros (
+    .write_strobe(write_strobe), 
+    .port_id(port_id), 
+    .hold_seg_hora(hold_seg_hora), 
+    .hold_min_hora(hold_min_hora), 
+    .hold_hora_hora(hold_hora_hora), 
+    .hold_dia_fecha(hold_dia_fecha), 
+    .hold_mes_fecha(hold_mes_fecha), 
+    .hold_jahr_fecha(hold_jahr_fecha), 
+    .hold_seg_timer(hold_seg_timer), 
+    .hold_min_timer(hold_min_timer), 
+    .hold_hora_timer(hold_hora_timer)
+    );
+*/
 endmodule

@@ -34,7 +34,7 @@ module deco_hold_registros(
 	 
 always@*
 begin
-if (write_strobe == 1'b1)
+if (write_strobe == 1'b1)begin
 	case(port_id)
 		8'h03: begin
 			hold_seg_hora = 1'b0;
@@ -147,6 +147,7 @@ if (write_strobe == 1'b1)
 			hold_hora_timer= 1'b1;
 		end
 	endcase
+	end
 	
 	else begin 
 		hold_seg_hora = 1'b1;
@@ -158,6 +159,7 @@ if (write_strobe == 1'b1)
 		hold_seg_timer= 1'b1;
 		hold_min_timer= 1'b1;
 		hold_hora_timer= 1'b1;
-	end	
 	end
+	end
+	
 endmodule
