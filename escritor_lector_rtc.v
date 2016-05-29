@@ -85,7 +85,8 @@ end
 always@* begin
 
 	if (~reg_rd) next_out_dato = dato_leido;
-	else next_out_dato = out_dato;
+	next_out_dato = out_dato;
+	
 	if ( write_strobe == 1'b1 || read_strobe == 1'b1) begin
 	// inicio de secuencia de lectura_escritura rtc
 	if(port_id == 8'h0E) en_funcion = 1'b1;
