@@ -23,7 +23,7 @@ module escritor_lector_rtc_2
 	input wire clk,reset,
 	input wire [7:0] in_dato,
 	input wire [7:0] addr_RAM,
-	input escribir_leer,
+	input wire escribir_leer,
 	input wire en_funcion,
 	output wire reg_a_d,reg_cs,reg_rd,reg_wr,
 	output wire[7:0]out_dato,

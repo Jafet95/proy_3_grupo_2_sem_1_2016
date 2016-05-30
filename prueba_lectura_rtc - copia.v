@@ -175,8 +175,8 @@ escritor_lector_rtc_2 instancia_escritor_lector_rtc_2 (
 //Para habilitar el generador de señales	 
 always@(posedge clk)
 begin
-	if(port_id == 8'h0E) en_funcion = 1'b1;
-	else en_funcion = 1'b0;
+	if(port_id == 8'h0E) en_funcion <= 1'b1;
+	else en_funcion <= 1'b0;
 end
 	 
 //Decodificación del puerto de entrada del microcontrolador
@@ -214,8 +214,8 @@ end
 	 
 /// maquina de estados para manipular fin lectura escritura
 always @ (negedge clk, posedge reset) begin 
-	if (reset) state_reg_flag = 1'b0;
-	else state_reg_flag = state_next_flag;
+	if (reset) state_reg_flag <= 1'b0;
+	else state_reg_flag <= state_next_flag;
 end
 
 always@* 
