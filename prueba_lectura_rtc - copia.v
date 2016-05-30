@@ -37,10 +37,10 @@ wire read_strobe;
 wire interrupt;
 // conexiones banco de registros a VGA
 wire [7:0]out_seg_hora,out_min_hora,out_hora_hora;
-wire [7:0]out_dia_fecha,out_mes_fecha,out_jahr_fecha,out_dia_semana;
+wire [7:0]out_dia_fecha,out_mes_fecha,out_jahr_fecha;
 wire [7:0]out_seg_timer,out_min_timer,out_hora_timer;
 
-//////////////////////////// hold's
+///////////////////////////// hold's
 wire hold_seg_hora; 
 wire hold_min_hora; 
 wire hold_hora_hora; 
@@ -54,15 +54,14 @@ wire hold_hora_timer;
 // wire hold_banderas_config;
 //////////////////////
 
+
 //Registros para el controlador RTC
-reg [7:0]in_dato, addr_RAM;
-reg en_funcion,escribir_leer;
+reg [7:0] in_dato, addr_RAM;
+reg en_funcion, escribir_leer;
 
 wire fin_lectura_escritura;
-reg [7:0]flag_done;
-wire [7:0]out_dato;
-
-reg state_reg_flag,state_next_flag;
+reg [7:0] flag_done;
+wire [7:0] out_dato;
 
 assign interrupt = 1'b0;
 
@@ -73,7 +72,7 @@ microcontrolador instancia_microcontrolador
     .interrupt(interrupt), 
     .in_port(in_port), 
     .write_strobe(write_strobe), 
-    .k_write_strobe(), 
+    .k_write_strobe(k_write_strobe), 
     .read_strobe(read_strobe), 
     .interrupt_ack(), 
     .port_id(port_id), 
@@ -97,20 +96,6 @@ controlador_VGA instancia_controlador_VGA
     .RGB(RGB)
     );
 	 
-deco_hold_registros instancia_deco_hold_registros (
-    .write_strobe(write_strobe), 
-    .port_id(port_id), 
-    .hold_seg_hora(hold_seg_hora), 
-    .hold_min_hora(hold_min_hora), 
-    .hold_hora_hora(hold_hora_hora), 
-    .hold_dia_fecha(hold_dia_fecha), 
-    .hold_mes_fecha(hold_mes_fecha), 
-    .hold_jahr_fecha(hold_jahr_fecha), 
-    .hold_seg_timer(hold_seg_timer), 
-    .hold_min_timer(hold_min_timer), 
-    .hold_hora_timer(hold_hora_timer)
-    );
-
 memoria_registros_VGA instancia_memoria_registros_VGA 
 (
     .clk(clk), 
@@ -156,84 +141,70 @@ memoria_registros_VGA instancia_memoria_registros_VGA
     .out_banderas_config()
 );
 
+deco_hold_registros instancia_deco_hold_registros (
+    .write_strobe(write_strobe), 
+    .port_id(port_id), 
+    .hold_seg_hora(hold_seg_hora), 
+    .hold_min_hora(hold_min_hora), 
+    .hold_hora_hora(hold_hora_hora), 
+    .hold_dia_fecha(hold_dia_fecha), 
+    .hold_mes_fecha(hold_mes_fecha), 
+    .hold_jahr_fecha(hold_jahr_fecha), 
+    .hold_seg_timer(hold_seg_timer), 
+    .hold_min_timer(hold_min_timer), 
+    .hold_hora_timer(hold_hora_timer)
+    );
+	 
 escritor_lector_rtc_2 instancia_escritor_lector_rtc_2 (
     .clk(clk), 
-    .reset(reset),
-	 .en_funcion(en_funcion),	 
-    .in_dato(in_dato),
-	 .addr_RAM(addr_RAM),
-	 .escribir_leer(escribir_leer),
+    .reset(reset), 
+    .in_dato(out_port),
+	 .port_id(port_id),
+	 .write_strobe(write_strobe), 
+	 .k_write_strobe(k_write_strobe),
+    .read_strobe(read_strobe),
     .reg_a_d(AD), 
     .reg_cs(CS), 
     .reg_rd(RD), 
     .reg_wr(WR), 
     .out_dato(out_dato), 
-    .fin_lectura_escritura(fin_lectura_escritura), 
+    .flag_done(fin_lectura_escritura), 
     .dato(dato)
     );
-
-//Para habilitar el generador de señales	 
-always@(posedge clk)
-begin
-	if(port_id == 8'h0E) en_funcion <= 1'b1;
-	else en_funcion <= 1'b0;
-end
 	 
 //Decodificación del puerto de entrada del microcontrolador
 
 always@(posedge clk)
 begin
-	case (port_id) 
-		8'h0F : in_port <= flag_done;
+		case (port_id) 
+		8'h0F : in_port <= fin_lectura_escritura;
 		8'h10 : in_port <= out_dato;
 	  default : in_port <= 8'bXXXXXXXX;  
 	endcase
 end
 
+/*
 //Decodificación del puerto de salida del microcontrolador
 
-always@(posedge clk)
+always@*
 begin
-	if (write_strobe == 1'b1)
+	if (write_strobe == 1'b1 || k_write_strobe == 1'b1)
 	
 		if(port_id == 8'h00)
 		begin
-			addr_RAM <= out_port;
+			addr_RAM = out_port;
 		end
 		
 		if(port_id == 8'h01)
 		begin
-			in_dato <= out_port;
+			in_dato = out_port;
 		end
 		
 		if(port_id == 8'h0E)
 		begin
-			escribir_leer <= out_port[0];
+			escribir_leer = out_port[0];
 		end
-end
-	 
-/// maquina de estados para manipular fin lectura escritura
-always @ (negedge clk, posedge reset) begin 
-	if (reset) state_reg_flag <= 1'b0;
-	else state_reg_flag <= state_next_flag;
-end
 
-always@* 
-begin
-state_next_flag = state_reg_flag;
-	case (state_reg_flag)
-	1'b0: begin
-		flag_done = 8'h00;
-		if (fin_lectura_escritura == 1) state_next_flag = 1'b1;
-		else state_next_flag = 1'b0;
-		end
-	1'b1: begin
-		flag_done = 8'h01;
-		if(port_id == 8'h0F && read_strobe == 1)  state_next_flag = 1'b0;//Cuando el micro lee el dato se baja la bandera
-		else  state_next_flag = 1'b1; 		
-	end
-	endcase
 end
-	 
-
+*/	 	 
 endmodule

@@ -8,42 +8,45 @@
 #EQU in_dia_fecha, 0x06 ;
 #EQU in_mes_fecha, 0x07 ;
 #EQU in_jahr_fecha, 0x08 ;
-#EQU in_dia_semana, 0x09 ;
 #EQU in_seg_timer, 0x0A ;
 #EQU in_min_timer, 0x0B ;
 #EQU in_hora_timer, 0x0C ;
-#EQU formato_hora, 0x0D ;
-#EQU estado_alarma, 0x0F ;
-#EQU signal_control_generation, 0x10 ;
-#EQU fin_rtc, 0x11 ;
-#EQU out_rtc_data, 0x12
-#EQU out_seg_hora, 0x13 ;
-#EQU out_min_hora, 0x44 ;
-#EQU out_hora_hora, 0x15 ;
-#EQU out_dia_fecha, 0x16 ;
-#EQU out_mes_fecha, 0x17 ;
-#EQU out_jahr_fecha, 0x18 ;
-#EQU out_dia_semana, 0x19 ;
-#EQU out_seg_timer, 0x1A ;
-#EQU out_min_timer, 0x1B ;
-#EQU out_hora_timer, 0x1C ;
+#EQU banderas_configuracion, 0x0D ;
+#EQU signal_control_generation, 0x0E ;
+#EQU fin_rtc, 0x0F;
+#EQU out_rtc_data, 0x10
+#EQU out_seg_hora, 0x11 ;
+#EQU out_min_hora, 0x12 ;
+#EQU out_hora_hora, 0x13 ;
+#EQU out_dia_fecha, 0x14 ;
+#EQU out_mes_fecha, 0x15 ;
+#EQU out_jahr_fecha, 0x16 ;
+#EQU out_dia_semana, 0x17 ;
+#EQU out_seg_timer, 0x18 ;
+#EQU out_min_timer, 0x19 ;
+#EQU out_hora_timer, 0x1A ;
 #EQU address, s0 ; Reg para manejo RTC
 #EQU data, s1;
 #EQU tecla, s2;
 #EQU done, s3;
+
 inicio:
-	load address, 0x00
-	load data,0x00
+	load address, 0x02
+	load data,0x10
 	call escritura
-	load data, 0x01
+	load data, 0x00
 	call escritura
 	load address, 0x10
 	load data, 0xd2
+	call escritura
+	load address, 0x00
+	load data,0x08
 	call escritura
 	jump main
 
 main:
 	call lectura_hora_fecha
+	call lectura_timer
 	jump main
 	;WRPRT tecla, teclado ; captura tecla
 	;load s4, tecla ; guarda lo q tiene 
@@ -72,17 +75,10 @@ lectura_hora_fecha:
 	WRPRT data, in_hora_hora
 	load address, 0x24 	;lee dia
 	call lectura
-	WRPRT data, in_dia_fecha 
-	load address, 0x25 	;lee mes
-	call lectura
 	WRPRT data, in_mes_fecha ;lee jahr
 	load address, 0x26
 	call lectura
 	WRPRT data, in_jahr_fecha
-	load address, 0x27;lee dia_semana
-	call lectura
-	WRPRT data, in_dia_semana
-	ret
 
 lectura_timer:
 	load address, 0x41 	;lee seg_timer
