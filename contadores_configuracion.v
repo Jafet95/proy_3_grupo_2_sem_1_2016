@@ -26,7 +26,8 @@ input wire [7:0] in_dato, port_id,
 input wire write_strobe, k_write_strobe,
 output wire [7:0] btn_data_SS, btn_data_MM, btn_data_HH, btn_data_YEAR, btn_data_MES, btn_data_DAY,
 btn_data_SS_T, btn_data_MM_T, btn_data_HH_T,//Decenas y unidades para los números en pantalla(configuración)
-output wire [1:0] cursor_location//Marca la posición del cursor en modo configuración
+output wire [1:0] cursor_location,//Marca la posición del cursor en modo configuración
+output wire [1:0] config_mode
 );
 
 //Declaración de parámetros
@@ -37,9 +38,25 @@ reg [N-1:0] q_act, q_next;//Contador horizontal
 wire [N-1:0] count_horizontal;
 
 reg enLEFT_reg, enRIGHT_reg, enUP_reg, enDOWN_reg;
+reg [1:0] reg_config_mode, next_config_mode;
 
 reg [3:0]enable_counters;//9 contadores en total de hora, fecha, timer
 
+//===========================================================================
+// Registro para el modo de configuración
+//===========================================================================
+always@(posedge clk)
+begin
+	if(reset) reg_config_mode <= 2'b0;
+	else reg_config_mode <= next_config_mode;
+end
+always@*
+begin
+	if((write_strobe == 1'b1 || k_write_strobe == 1'b1)&&(port_id == 8'h11)) next_config_mode = in_dato[4:3];
+	else next_config_mode = reg_config_mode;
+end
+
+assign config_mode = reg_config_mode;
 //===========================================================================
 // Registro para generar el pulso de las teclas para modificar los contadores
 //===========================================================================
