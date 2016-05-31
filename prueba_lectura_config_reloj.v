@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date:    13:49:19 05/27/2016 
+// Create Date:    14:55:17 05/31/2016 
 // Design Name: 
-// Module Name:    prueba_lectura_rtc 
+// Module Name:    prueba_lectura_config_reloj 
 // Project Name: 
 // Target Devices: 
 // Tool versions: 
@@ -18,10 +18,11 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module prueba_lectura_rtc_2
+module prueba_lectura_config_reloj
 (
 input wire clk, reset,
-input wire sw,
+input wire ps2data, 
+input wire ps2clk, 
 inout [7:0]dato,
 output wire AD, CS, WR, RD,
 output [7:0] RGB,
@@ -61,9 +62,6 @@ wire fin_lectura_escritura;
 wire [7:0] out_dato;
 
 assign interrupt = 1'b0;
-
-wire wire_sw;
-assign wire_sw = {7'b0,sw};
 
 microcontrolador instancia_microcontrolador 
 (
@@ -172,6 +170,16 @@ escritor_lector_rtc_2 instancia_escritor_lector_rtc_2 (
     .dato(dato)
     );
 	 
+controlador_teclado_ps2 instancia_controlador_teclado_ps2 (
+    .clk(clk), 
+    .reset(reset), 
+    .ps2data(ps2data), 
+    .ps2clk(ps2clk), 
+    .port_id(port_id), 
+    .read_strobe(read_strobe), 
+    .ascii_code(ascii_code)
+    );
+	 
 //Decodificación del puerto de entrada del microcontrolador
 
 always@(posedge clk)
@@ -179,9 +187,10 @@ begin
 		case (port_id) 
 		8'h0F : in_port <= fin_lectura_escritura;
 		8'h10 : in_port <= out_dato;
-		8'h02 : in_port <= wire_sw;
+		8'h02 : in_port <= ascii_code;
 	  default : in_port <= 8'bXXXXXXXX;  
 	endcase
 end
 	 	 
 endmodule
+
