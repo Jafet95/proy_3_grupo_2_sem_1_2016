@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-tmodule keycode_to_ascii
+module keycode_to_ascii
 (
 input wire [7:0] key_code,
 output reg [7:0] ascii_code
@@ -31,7 +31,7 @@ begin
 		8'h05: ascii_code = 8'h21;//F1(!) Reset del rtc
 		8'h06: ascii_code = 8'h22;//F2(")
 		8'h1c: ascii_code = 8'h41;//A Salida de configuracion sin configurar
-		8'h23: ascii_code = 8'h44;//D Apargar el timer
+		8'h23: ascii_code = 8'h44;//D Apargar alarma del timer
 		8'h2b: ascii_code = 8'h46;//F entrar en configuracion fecha
 		8'h33: ascii_code = 8'h48;//H entra en configuracion hora
 		8'h3a: ascii_code = 8'h4d;//M
