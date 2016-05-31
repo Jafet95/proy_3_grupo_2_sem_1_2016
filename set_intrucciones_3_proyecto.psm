@@ -1,5 +1,4 @@
-;ID_PORT direction
-#EQU address_rtc, 0x00 ; 
+#EQU address_rtc, 0x00  ;ID_PORT direction
 #EQU in_data_rtc, 0x01 ;
 #EQU teclado, 0x02 ;
 #EQU in_seg_hora, 0x03 ;
@@ -42,13 +41,17 @@ inicio:
 	load address, 0x00
 	load data,0x08
 	call escritura
+	load data, 0x00
+	call escritura_inicializacion
 	jump main
 
 main:
 	call lectura_hora_fecha
 	call lectura_timer
-	jump main
-	;WRPRT tecla, teclado ; captura tecla
+	
+	RDPRT tecla, teclado ; captura tecla
+	comp tecla, 0x01
+	jump z escritura_inicializacion_2
 	;load s4, tecla ; guarda lo q tiene 
 	;SUB tecla, 0x68
 	;call z configurar_hora
@@ -58,6 +61,7 @@ main:
 	;load tecla, s4
 	;SUB tecla, 0x74
 	;call z configurar_timer
+	jump main
 	
 ;configurar_hora:
 	
@@ -79,6 +83,7 @@ lectura_hora_fecha:
 	load address, 0x26
 	call lectura
 	WRPRT data, in_jahr_fecha
+	ret
 
 lectura_timer:
 	load address, 0x41 	;lee seg_timer
@@ -108,6 +113,7 @@ escritura_timer:
 	ret
 	
 escritura_hora_fecha:
+	load data,0x00
 	load address, 0x21 ; escribe seg hora
 	RDPRT data, out_seg_hora
 	call escritura
@@ -129,7 +135,58 @@ escritura_hora_fecha:
 	load address, 0x27 ; escribe dia semana
 	RDPRT data, out_dia_semana
 	call escritura
-	ret	
+	ret
+	
+escritura_inicializacion_2:
+	load data, 0x00
+	load address, 0x21 ; escribe seg hora
+	call escritura
+	load address, 0x22 ; escribe min hora
+	call escritura
+	load address, 0x23 ; escribe hora hora
+	call escritura
+	load address, 0x24 ; escribe dia fecha
+	call escritura
+	load address, 0x25 ; escribe mes fecha
+	call escritura
+	load address, 0x26 ; escribe jahr fecha
+	call escritura
+	load address, 0x27 ; escribe dia semana
+	call escritura
+	load address, 0x41 ; escribe seg timer
+	call escritura
+	load address, 0x42 ; escribe seg timer
+	call escritura
+	load address, 0x43 ; escribe seg timer
+	call escritura
+	load address, 0xF0 ; escribe comando de escritura
+	call escritura
+	ret		
+
+escritura_inicializacion:
+	load address, 0x21 ; escribe seg hora
+	call escritura
+	load address, 0x22 ; escribe min hora
+	call escritura
+	load address, 0x23 ; escribe hora hora
+	call escritura
+	load address, 0x24 ; escribe dia fecha
+	call escritura
+	load address, 0x25 ; escribe mes fecha
+	call escritura
+	load address, 0x26 ; escribe jahr fecha
+	call escritura
+	load address, 0x27 ; escribe dia semana
+	call escritura
+	load address, 0x41 ; escribe seg timer
+	call escritura
+	load address, 0x42 ; escribe seg timer
+	call escritura
+	load address, 0x43 ; escribe seg timer
+	call escritura
+	load address, 0xF0 ; escribe comando de escritura
+	call escritura
+	ret		
 	
 escritura:
 	load s5,0x01

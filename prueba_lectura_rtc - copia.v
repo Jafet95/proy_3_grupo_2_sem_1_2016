@@ -55,12 +55,8 @@ wire hold_hora_timer;
 //////////////////////
 
 
-//Registros para el controlador RTC
-reg [7:0] in_dato, addr_RAM;
-reg en_funcion, escribir_leer;
-
+//Conexiones de controlador RTC
 wire fin_lectura_escritura;
-reg [7:0] flag_done;
 wire [7:0] out_dato;
 
 assign interrupt = 1'b0;
@@ -179,32 +175,9 @@ begin
 		case (port_id) 
 		8'h0F : in_port <= fin_lectura_escritura;
 		8'h10 : in_port <= out_dato;
+		//8'h02 : in_port <= sw;
 	  default : in_port <= 8'bXXXXXXXX;  
 	endcase
 end
-
-/*
-//Decodificación del puerto de salida del microcontrolador
-
-always@*
-begin
-	if (write_strobe == 1'b1 || k_write_strobe == 1'b1)
-	
-		if(port_id == 8'h00)
-		begin
-			addr_RAM = out_port;
-		end
-		
-		if(port_id == 8'h01)
-		begin
-			in_dato = out_port;
-		end
-		
-		if(port_id == 8'h0E)
-		begin
-			escribir_leer = out_port[0];
-		end
-
-end
-*/	 	 
+	 	 
 endmodule

@@ -32,8 +32,7 @@ module escritor_lector_rtc_2
 wire fin_lectura_escritura; 
 reg en_funcion;
 reg [7:0]addr_RAM,dato_escribir;
-//wire [7:0]dato_leido;
-reg [7:0]reg_addr_RAM, reg_dato_escribir,reg_dato_leido;
+reg [7:0]reg_addr_RAM, reg_dato_escribir;
 reg reg_escribir_leer,escribir_leer;
 
 
