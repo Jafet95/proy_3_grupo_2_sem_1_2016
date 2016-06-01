@@ -34,32 +34,8 @@ reg [N-1:0] q_act, q_next;
 wire [N-1:0] count_data;
 reg [3:0] digit1, digit0;
 
-//=============================================
-// Bits del contador para generar una señal periódica de (2^N)*10ns
-localparam N_bits =24;//~4Hz
-
-reg [N_bits-1:0] btn_pulse_reg;
-reg btn_pulse;
-
-always @(posedge clk, posedge reset)
-begin
-	if (reset)begin btn_pulse_reg <= 0; btn_pulse <= 0; end
-	
-	else
-	begin
-		if (btn_pulse_reg == 24'd12999999)
-			begin
-			btn_pulse_reg <= 0;
-			btn_pulse <= ~btn_pulse;
-			end
-		else
-			btn_pulse_reg <= btn_pulse_reg + 1'b1;
-	end
-end	
-//____________________________________________________________________________________________________________
-
 //Descripción del comportamiento
-always@(posedge btn_pulse, posedge reset)
+always@(posedge clk, posedge reset)
 begin	
 	
 	if(reset)

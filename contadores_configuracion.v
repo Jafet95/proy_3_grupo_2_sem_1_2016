@@ -190,7 +190,6 @@ contador_AD_HH_2dig Instancia_contador_HH//Horas de la hora
 .en_count(enable_counters),
 .enUP(enUP_reg),
 .enDOWN(enDOWN_reg),
-.AM_PM(AM_PM),
 .data_HH(btn_data_HH)
 );   
 
@@ -286,7 +285,7 @@ always@*
 		
 		endcase
 	end
-	3'd4:
+	3'd3:
 	begin
 		case(count_horizontal)
 		

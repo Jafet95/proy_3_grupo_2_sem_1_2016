@@ -22,6 +22,8 @@ module memoria_registros_VGA
 ( 
 	input clk, reset,
 	
+	input wire formato_hora,
+	
 	input cs_seg_hora,cs_min_hora,cs_hora_hora,
 	input cs_dia_fecha,cs_mes_fecha,cs_jahr_fecha,
 	input cs_seg_timer,cs_min_timer,cs_hora_timer,
@@ -38,11 +40,13 @@ module memoria_registros_VGA
 	input [7:0] count_dia_fecha,count_mes_fecha,count_jahr_fecha,
 	input [7:0] count_seg_timer,count_min_timer,count_hora_timer,
 	
-	output [7:0] out_seg_hora,out_min_hora,out_hora_hora,
-	output [7:0] out_dia_fecha,out_mes_fecha,out_jahr_fecha,
-	output [7:0] out_seg_timer,out_min_timer,out_hora_timer,
+	output wire[7:0] out_seg_hora,out_min_hora,out_hora_hora,
+	output wire[7:0] out_dia_fecha,out_mes_fecha,out_jahr_fecha,
+	output wire[7:0] out_seg_timer,out_min_timer,out_hora_timer,
 	
-	output[7:0] out_banderas_config
+	output[1:0] out_banderas_config,
+	
+	output reg AM_PM
 );
 	 
 //wire flag1,flag2,flag3;
@@ -51,7 +55,10 @@ reg flag_done_timer;
 wire cs_banderas_config;
 
 assign cs_banderas_config = 1'b0;
- 
+
+wire [7:0]data_HH;//Dato de hora del registro
+reg [3:0]digit0_HH, digit1_HH;
+
 ////////instancia reg seg_hora
 Registro_Universal #(.N(8))
 instancia_seg_hora (
@@ -83,7 +90,7 @@ instancia_hora_hora (
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_hora_hora), 
-    .out_dato(out_hora_hora)
+    .out_dato(data_HH)
     );
 ////////instancia reg dia_fecha
 Registro_Universal #(.N(8))
@@ -152,17 +159,63 @@ instancia_hora_timer(
     .out_dato(out_hora_timer)
     );
 ////////instancia reg banderas_config
-Registro_Universal #(.N(8))
+Registro_Universal #(.N(2))
 instancia_bandera_config(
 	 .hold(hold_banderas_config),
-    .in_rtc_dato(data_PicoBlaze), 
-    .in_count_dato(8'b0), 
+    .in_rtc_dato(data_PicoBlaze[1:0]), 
+    .in_count_dato(2'b0), 
     .clk(clk), 
     .reset(reset), 
     .chip_select(cs_banderas_config),
     .out_dato(out_banderas_config)
     );
+	 
+//=============================================
+// BLOQUE PARA TRADUCIR FORMATO DE LA HORA
+//=============================================
+always@*
+begin
+	if(formato_hora)//12 hrs (Traduce a formato 12 hrs)
+	begin
+		case(data_HH)
+		8'd0: begin digit1_HH = 4'b0001; digit0_HH = 4'b0010; AM_PM = 0; end//00 BCD en 8 bits
+		8'd1: begin digit1_HH = 4'b0000; digit0_HH = 4'b0001; AM_PM = 0; end//01 BCD en 8 bits
+		8'd2: begin digit1_HH = 4'b0000; digit0_HH = 4'b0010; AM_PM = 0; end//02 BCD en 8 bits
+		8'd3: begin digit1_HH = 4'b0000; digit0_HH = 4'b0011; AM_PM = 0; end//03 BCD en 8 bits
+		8'd4: begin digit1_HH = 4'b0000; digit0_HH = 4'b0100; AM_PM = 0; end//04 BCD en 8 bits
+		8'd5: begin digit1_HH = 4'b0000; digit0_HH = 4'b0101; AM_PM = 0; end//05 BCD en 8 bits
+		8'd6: begin digit1_HH = 4'b0000; digit0_HH = 4'b0110; AM_PM = 0; end//06 BCD en 8 bits
+		8'd7: begin digit1_HH = 4'b0000; digit0_HH = 4'b0111; AM_PM = 0; end//07 BCD en 8 bits
+		8'd8: begin digit1_HH = 4'b0000; digit0_HH = 4'b1000; AM_PM = 0; end//08 BCD en 8 bits
+		8'd9: begin digit1_HH = 4'b0000; digit0_HH = 4'b1001; AM_PM = 0; end//09 BCD en 8 bits
+		8'd16: begin digit1_HH = 4'b0001; digit0_HH = 4'b0000; AM_PM = 0; end//10 BCD en 8 bits
+		8'd17: begin digit1_HH = 4'b0001; digit0_HH = 4'b0001; AM_PM = 0; end//11 BCD en 8 bits
+		
+		8'd18: begin digit1_HH = 4'b0001; digit0_HH = 4'b0010; AM_PM = 1; end//12 BCD en 8 bits
+		8'd19: begin digit1_HH = 4'b0000; digit0_HH = 4'b0001; AM_PM = 1; end//13 BCD en 8 bits
+		8'd20: begin digit1_HH = 4'b0000; digit0_HH = 4'b0010; AM_PM = 1; end//14 BCD en 8 bits
+		8'd21: begin digit1_HH = 4'b0000; digit0_HH = 4'b0011; AM_PM = 1; end//15 BCD en 8 bits
+		8'd22: begin digit1_HH = 4'b0000; digit0_HH = 4'b0100; AM_PM = 1; end//16 BCD en 8 bits
+		8'd23: begin digit1_HH = 4'b0000; digit0_HH = 4'b0101; AM_PM = 1; end//17 BCD en 8 bits
+		8'd24: begin digit1_HH = 4'b0000; digit0_HH = 4'b0110; AM_PM = 1; end//18 BCD en 8 bits
+		8'd25: begin digit1_HH = 4'b0000; digit0_HH = 4'b0111; AM_PM = 1; end//19 BCD en 8 bits
+		8'd32: begin digit1_HH = 4'b0000; digit0_HH = 4'b1000; AM_PM = 1; end//20 BCD en 8 bits
+		8'd33: begin digit1_HH = 4'b0000; digit0_HH = 4'b1001; AM_PM = 1; end//21 BCD en 8 bits
+		8'd34: begin digit1_HH = 4'b0001; digit0_HH = 4'b0000; AM_PM = 1; end//22 BCD en 8 bits
+		8'd35: begin digit1_HH = 4'b0001; digit0_HH = 4'b0001; AM_PM = 1; end//23 BCD en 8 bits
+		default:  begin digit1_HH = 0; digit0_HH = 0; AM_PM = 0; end
+		endcase
+	end
+	
+	else //24 hrs (Transfiere el dato simplemente)
+	begin
+		digit1_HH = data_HH[7:4];
+		digit0_HH = data_HH[3:0];
+		AM_PM = 0;
+	end
+end
 
+assign out_hora_hora = {digit1_HH,digit0_HH};
 /*
 //Para generar flag_done_timer
 always@(posedge clk)

@@ -29,7 +29,8 @@ module deco_hold_registros(
 	output reg hold_jahr_fecha,
 	output reg hold_seg_timer,
 	output reg hold_min_timer,
-	output reg hold_hora_timer
+	output reg hold_hora_timer,
+	output reg hold_banderas_config
     );
 	 
 always@*
@@ -46,6 +47,7 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b1;
 			hold_min_timer= 1'b1;
 			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b1;
 		end
 		8'h04:begin
 			hold_seg_hora = 1'b1;
@@ -57,6 +59,7 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b1;
 			hold_min_timer= 1'b1;
 			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b1;
 		end
 		8'h05: begin
 			hold_seg_hora = 1'b1;
@@ -68,6 +71,7 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b1;
 			hold_min_timer= 1'b1;
 			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b1;
 		end
 		8'h06: begin
 			hold_seg_hora = 1'b1;
@@ -79,6 +83,7 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b1;
 			hold_min_timer= 1'b1;
 			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b1;
 		end
 		8'h07: begin
 			hold_seg_hora = 1'b1;
@@ -90,6 +95,7 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b1;
 			hold_min_timer= 1'b1;
 			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b1;
 		end
 		8'h08: begin
 			hold_seg_hora = 1'b1;
@@ -101,6 +107,7 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b1;
 			hold_min_timer= 1'b1;
 			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b1;
 		end
 		8'h0A: begin
 			hold_seg_hora = 1'b1;
@@ -112,6 +119,7 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b0;
 			hold_min_timer= 1'b1;
 			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b1;
 		end
 		8'h0B: begin
 			hold_seg_hora = 1'b1;
@@ -123,6 +131,7 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b1;
 			hold_min_timer= 1'b0;
 			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b1;
 		end
 		8'h0C: begin
 			hold_seg_hora = 1'b1;
@@ -134,6 +143,19 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b1;
 			hold_min_timer= 1'b1;
 			hold_hora_timer= 1'b0;
+			hold_banderas_config= 1'b1;
+		end
+		8'h0D: begin
+			hold_seg_hora = 1'b1;
+			hold_min_hora= 1'b1;
+			hold_hora_hora= 1'b1;
+			hold_dia_fecha= 1'b1;
+			hold_mes_fecha= 1'b1;
+			hold_jahr_fecha= 1'b1;
+			hold_seg_timer= 1'b1;
+			hold_min_timer= 1'b1;
+			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b0;
 		end
 		default: begin
 			hold_seg_hora = 1'b1;
@@ -145,6 +167,7 @@ if (write_strobe == 1'b1)begin
 			hold_seg_timer= 1'b1;
 			hold_min_timer= 1'b1;
 			hold_hora_timer= 1'b1;
+			hold_banderas_config= 1'b1;
 		end
 	endcase
 	end
@@ -159,6 +182,7 @@ if (write_strobe == 1'b1)begin
 		hold_seg_timer= 1'b1;
 		hold_min_timer= 1'b1;
 		hold_hora_timer= 1'b1;
+		hold_banderas_config= 1'b1;
 	end
 	end
 	
