@@ -14,56 +14,170 @@
 #EQU signal_control_generation, 0x0E ;
 #EQU fin_rtc, 0x0F;
 #EQU out_rtc_data, 0x10
-#EQU out_seg_hora, 0x11 ;
-#EQU out_min_hora, 0x12 ;
-#EQU out_hora_hora, 0x13 ;
-#EQU out_dia_fecha, 0x14 ;
-#EQU out_mes_fecha, 0x15 ;
-#EQU out_jahr_fecha, 0x16 ;
-#EQU out_dia_semana, 0x17 ;
+#EQU programar_configuracion, 0x11
+#EQU out_seg_hora, 0x12 ;
+#EQU out_min_hora, 0x13 ;
+#EQU out_hora_hora, 0x14 ;
+#EQU out_dia_fecha, 0x15 ;
+#EQU out_mes_fecha, 0x16 ;
+#EQU out_jahr_fecha, 0x17 ;
 #EQU out_seg_timer, 0x18 ;
 #EQU out_min_timer, 0x19 ;
 #EQU out_hora_timer, 0x1A ;
 #EQU address, s0 ; Reg para manejo RTC
 #EQU data, s1;
-#EQU tecla, s2;
-#EQU done, s3;
+#EQU tecla, s2; reg para variable del teclado
+#EQU done, s3; flag de fin de lectura
+#EQU temporal,s4 ;variable temporal para configuracion
+#EQU dato_contador, s6
+#EQU timer_seg, s7
+#EQU timer_min,s8
+#EQU timer_hora,s9
+#EQU alarma, sA
+#EQU formato_alarma, sB
 
 inicio:
 	load address, 0x02
 	load data,0x10
+	load timer_seg, 0xFF
+	load timer_seg, 0xFF
+	load timer_seg, 0xFF
 	call escritura
 	load data, 0x00
 	call escritura
 	load address, 0x10
 	load data, 0xd2
 	call escritura
-	load address, 0x00
-	load data,0x08
-	call escritura
-	load data, 0x00
 	call escritura_inicializacion
 	jump main
-
+	
 main:
+	and dato_contador, 0xE0
+	WRPRT dato_contador, programar_configuracion
+	RDPRT tecla, teclado; captura tecla
+	load temporal, tecla ; guarda lo q tiene 
+	comp tecla, 0x21
+	call z escritura_inicializacion
+	load tecla,temporal
+	SUB tecla, 0x44
+	call z desactivar_alarma
+	load tecla, temporal 
+	SUB tecla, 0x48
+	call z configurar_hora
+	load tecla, temporal
+	SUB tecla, 0x46
+	call z configurar_fecha
+	load tecla, temporal
+	SUB tecla, 0x54
+	call z configurar_timer
+	load tecla,temporal
+	sub tecla, 0x53
+	call z cambiar_formato
+	call lectura_hora_fecha
+	call lectura_timer	
+	jump main	
+	
+configurar_hora:
+	load dato_contador, 0x08
+	WRPRT dato_contador, programar_configuracion
+	load temporal, alarma
+	comp temporal, 0x03
+	call z activar_alarma
+	RDPRT tecla, teclado ; captura tecla
+	load temporal, tecla
+	comp tecla, 0x34
+	call z tecla_left
+	load tecla,temporal
+	comp tecla, 0x35
+	call z tecla_down
+	load tecla,temporal
+	comp tecla, 0x36
+	call z tecla_right
+	load tecla,temporal
+	comp tecla, 0x38
+	call z tecla_up
+	load tecla,temporal
+	comp tecla, 0x0D
+	call z escritura_hora_fecha
+	load tecla,temporal
+	comp tecla, 0x41
+	jump z main
+	call lectura_timer
+	jump configurar_hora
+	
+configurar_fecha:
+	load dato_contador, 0x10
+	WRPRT dato_contador, programar_configuracion
+    load temporal, alarma
+	comp temporal, 0x03
+	call z activar_alarma
+	RDPRT tecla, teclado ; captura tecla
+	load temporal, tecla
+	comp tecla, 0x34
+	call z tecla_left
+	load tecla,temporal
+	comp tecla, 0x35
+	call z tecla_down
+	load tecla,temporal
+	comp tecla, 0x36
+	call z tecla_right
+	load tecla,temporal
+	comp tecla, 0x38
+	call z tecla_up
+	load tecla,temporal
+	comp tecla, 0x0D
+	call z escritura_hora_fecha
+	load tecla,temporal
+	comp tecla, 0x41
+	jump z main
 	call lectura_hora_fecha
 	call lectura_timer
+	jump configurar_fecha	
 	
+configurar_timer:
+	load dato_contador, 0x18
+	WRPRT dato_contador, programar_configuracion
+	load temporal, alarma
+	comp temporal, 0x03
+	call z activar_alarma
 	RDPRT tecla, teclado ; captura tecla
-	comp tecla, 0x01
-	jump z escritura_inicializacion_2
-	;load s4, tecla ; guarda lo q tiene 
-	;SUB tecla, 0x68
-	;call z configurar_hora
-	;load tecla, s4
-	;SUB tecla, 0x66
-	;call z configurar_fecha
-	;load tecla, s4
-	;SUB tecla, 0x74
-	;call z configurar_timer
-	jump main
+	load temporal, tecla
+	comp tecla, 0x34
+	call z tecla_left
+	load tecla,temporal
+	comp tecla, 0x35
+	call z tecla_down
+	load tecla,temporal
+	comp tecla, 0x36
+	call z tecla_right
+	load tecla,temporal
+	comp tecla, 0x38
+	call z tecla_up
+	load tecla,temporal
+	comp tecla, 0x0D
+	call z escritura_timer
+	load tecla,temporal
+	comp tecla, 0x41
+	jump z main
+	call lectura_hora_fecha
+	jump configurar_timer
 	
-;configurar_hora:
+tecla_up: ; Rutinas para botones del banco de contadores
+	add dato_contador, 0x05
+	WRPRT dato_contador, programar_configuracion
+	ret	
+tecla_down:
+	add dato_contador, 0x06
+	WRPRT dato_contador, programar_configuracion
+	ret	
+tecla_left:
+	add dato_contador, 0x07
+	WRPRT dato_contador, programar_configuracion
+	ret	
+tecla_right:
+	add dato_contador, 0x04
+	WRPRT dato_contador, programar_configuracion
+	ret	
 	
 lectura_hora_fecha:
 	load address, 0xF0
@@ -79,41 +193,59 @@ lectura_hora_fecha:
 	WRPRT data, in_hora_hora
 	load address, 0x24 	;lee dia
 	call lectura
-	WRPRT data, in_mes_fecha ;lee jahr
-	load address, 0x26
+	WRPRT data, in_dia_fecha
+	load address, 0x25	;lee mes
+	call lectura
+	WRPRT data, in_mes_fecha
+	load address, 0x26	;lee jahr
 	call lectura
 	WRPRT data, in_jahr_fecha
 	ret
-
+	
 lectura_timer:
+	load alarma, 0x00
+	load address, 0xF0
+	call lectura
 	load address, 0x41 	;lee seg_timer
 	call lectura
 	WRPRT data, in_seg_timer ;lee min_timer
+	comp data, timer_seg
+	jump z generacion_alarma
 	load address, 0x42
 	call lectura
 	WRPRT data, in_min_timer
+	comp data, timer_min
+	jump z generacion_alarma
 	load address, 0x43 ;lee dia_semana
 	call lectura
 	WRPRT data, in_hora_timer
-	ret
-
-escritura_timer:
-	load address, 0x41 ; escribe seg timer
-	RDPRT data, out_seg_timer
-	call escritura
-	load address, 0x42 ; escribe seg timer
-	RDPRT data, out_min_timer
-	call escritura
-	load address, 0x43 ; escribe seg timer
-	RDPRT data, out_hora_timer
-	call escritura
-	load address, 0xF2 ; escribe comando de escritura
-	RDPRT data, out_hora_timer
-	call escritura
+	comp data, timer_hora
+	jump z generacion_alarma
 	ret
 	
-escritura_hora_fecha:
+escritura_timer:
+	load alarma, 0x00
+	RDPRT data, out_seg_timer
+	load timer_seg,data
+	RDPRT data, out_min_timer
+	load timer_min,data
+	RDPRT data, out_hora_timer
+	load timer_hora,data
 	load data,0x00
+	load address, 0x41 ; escribe seg timer
+	call escritura
+	load address, 0x42 ; escribe seg timer
+	call escritura
+	load address, 0x43 ; escribe seg timer
+	call escritura
+	load address, 0xF2 ; escribe comando de escritura
+	call escritura
+	load address, 0x00
+	load data,0x08
+	call escritura
+	jump main	
+	
+escritura_hora_fecha:
 	load address, 0x21 ; escribe seg hora
 	RDPRT data, out_seg_hora
 	call escritura
@@ -121,7 +253,7 @@ escritura_hora_fecha:
 	RDPRT data, out_min_hora
 	call escritura
 	load address, 0x23 ; escribe hora hora
-	RDPRT data, out_hora_timer
+	RDPRT data, out_hora_hora
 	call escritura
 	load address, 0x24 ; escribe dia fecha
 	RDPRT data, out_dia_fecha
@@ -132,12 +264,11 @@ escritura_hora_fecha:
 	load address, 0x26 ; escribe jahr fecha
 	RDPRT data, out_jahr_fecha
 	call escritura
-	load address, 0x27 ; escribe dia semana
-	RDPRT data, out_dia_semana
-	call escritura
-	ret
+	load address, 0xF1 ; escribe comando de escritura
+	call escritura	
+	jump main	
 	
-escritura_inicializacion_2:
+escritura_inicializacion:
 	load data, 0x00
 	load address, 0x21 ; escribe seg hora
 	call escritura
@@ -145,13 +276,13 @@ escritura_inicializacion_2:
 	call escritura
 	load address, 0x23 ; escribe hora hora
 	call escritura
+	load data, 0x01
 	load address, 0x24 ; escribe dia fecha
 	call escritura
 	load address, 0x25 ; escribe mes fecha
 	call escritura
+	load data, 0x00
 	load address, 0x26 ; escribe jahr fecha
-	call escritura
-	load address, 0x27 ; escribe dia semana
 	call escritura
 	load address, 0x41 ; escribe seg timer
 	call escritura
@@ -162,44 +293,19 @@ escritura_inicializacion_2:
 	load address, 0xF0 ; escribe comando de escritura
 	call escritura
 	ret		
-
-escritura_inicializacion:
-	load address, 0x21 ; escribe seg hora
-	call escritura
-	load address, 0x22 ; escribe min hora
-	call escritura
-	load address, 0x23 ; escribe hora hora
-	call escritura
-	load address, 0x24 ; escribe dia fecha
-	call escritura
-	load address, 0x25 ; escribe mes fecha
-	call escritura
-	load address, 0x26 ; escribe jahr fecha
-	call escritura
-	load address, 0x27 ; escribe dia semana
-	call escritura
-	load address, 0x41 ; escribe seg timer
-	call escritura
-	load address, 0x42 ; escribe seg timer
-	call escritura
-	load address, 0x43 ; escribe seg timer
-	call escritura
-	load address, 0xF0 ; escribe comando de escritura
-	call escritura
-	ret		
-	
+		
 escritura:
-	load s5,0x01
+	load temporal,0x01
 	WRPRT address, address_rtc
 	WRPRT data, in_data_rtc
-	WRPRT s5, signal_control_generation
+	WRPRT temporal, signal_control_generation
 	call wait
 	ret
 	
 lectura:
-	load s5,0x00
+	load temporal,0x00
 	WRPRT address, address_rtc
-	WRPRT s5, signal_control_generation
+	WRPRT temporal, signal_control_generation
 	call wait
 	RDPRT data, out_rtc_data
 	ret
@@ -209,3 +315,29 @@ wait:
 	comp done, 0x01
 	jump nz wait
 	ret
+	
+generacion_alarma:
+	add alarma, 0x01
+	comp alarma, 0x03
+	call z activar_alarma
+	ret
+activar_alarma:
+	or formato_alarma, 0x01
+	WRPRT formato_alarma, banderas_configuracion
+	load alarma, 0x00
+	load address, 0x00
+	load data,0x00
+	call escritura
+	ret
+desactivar_alarma:
+	and formato_alarma, 0x02
+	WRPRT formato_alarma, banderas_configuracion
+	load timer_seg, 0xFF
+	load timer_min, 0xFF
+	load timer_hora 0xFF
+	ret
+cambiar_formato:
+	and formato_alarma, 0x03
+	add formato_alarma, 0x02
+	wrprt formato_alarma, banderas_configuracion
+	ret 

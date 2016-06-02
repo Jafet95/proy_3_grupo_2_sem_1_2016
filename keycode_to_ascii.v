@@ -31,12 +31,12 @@ begin
 		8'h05: ascii_code = 8'h21;//F1(!) Reset del rtc
 		8'h06: ascii_code = 8'h22;//F2(")
 		8'h1c: ascii_code = 8'h41;//A Salida de configuracion sin configurar
-		8'h23: ascii_code = 8'h44;//D Apargar alarma del timer
+		8'h23: ascii_code = 8'h44;//D Apagar alarma del timer
 		8'h2b: ascii_code = 8'h46;//F entrar en configuracion fecha
 		8'h33: ascii_code = 8'h48;//H entra en configuracion hora
 		8'h3a: ascii_code = 8'h4d;//M
 		8'h2d: ascii_code = 8'h52;//R 
-		8'h1b: ascii_code = 8'h53;//S
+		8'h1b: ascii_code = 8'h53;//S cambiar formato hora
 		8'h2c: ascii_code = 8'h54;//T entra en configuracion timer
 		8'h72: ascii_code = 8'h35;//flecha abajo (5) 
 		8'h6b: ascii_code = 8'h34;//flecha izquierda (4) 
