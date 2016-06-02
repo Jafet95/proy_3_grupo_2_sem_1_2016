@@ -37,6 +37,7 @@
 #EQU formato_alarma, sB
 
 inicio:
+	load formato_alarma, 0x00 ; inicializa la variable
 	load address, 0x02
 	load data,0x10
 	load timer_seg, 0xFF
@@ -55,23 +56,17 @@ main:
 	and dato_contador, 0xE0
 	WRPRT dato_contador, programar_configuracion
 	RDPRT tecla, teclado; captura tecla
-	load temporal, tecla ; guarda lo q tiene 
-	comp tecla, 0x21
+	comp tecla, 0x21 ; compara con letra F1
 	call z escritura_inicializacion
-	load tecla,temporal
-	SUB tecla, 0x44
+	comp tecla, 0x44  ; compara con letra D
 	call z desactivar_alarma
-	load tecla, temporal 
-	SUB tecla, 0x48
+	comp tecla, 0x48 ; compara con letra H
 	call z configurar_hora
-	load tecla, temporal
-	SUB tecla, 0x46
+	comp tecla, 0x46 ; compara con letra F
 	call z configurar_fecha
-	load tecla, temporal
-	SUB tecla, 0x54
+	comp tecla, 0x54 ; compara con letra T
 	call z configurar_timer
-	load tecla,temporal
-	sub tecla, 0x53
+	comp tecla, 0x53 ; compara con letra A
 	call z cambiar_formato
 	call lectura_hora_fecha
 	call lectura_timer	
@@ -80,26 +75,17 @@ main:
 configurar_hora:
 	load dato_contador, 0x08
 	WRPRT dato_contador, programar_configuracion
-	load temporal, alarma
-	comp temporal, 0x03
-	call z activar_alarma
 	RDPRT tecla, teclado ; captura tecla
-	load temporal, tecla
 	comp tecla, 0x34
 	call z tecla_left
-	load tecla,temporal
 	comp tecla, 0x35
 	call z tecla_down
-	load tecla,temporal
 	comp tecla, 0x36
 	call z tecla_right
-	load tecla,temporal
 	comp tecla, 0x38
 	call z tecla_up
-	load tecla,temporal
 	comp tecla, 0x0D
 	call z escritura_hora_fecha
-	load tecla,temporal
 	comp tecla, 0x41
 	jump z main
 	call lectura_timer
@@ -108,26 +94,17 @@ configurar_hora:
 configurar_fecha:
 	load dato_contador, 0x10
 	WRPRT dato_contador, programar_configuracion
-    load temporal, alarma
-	comp temporal, 0x03
-	call z activar_alarma
 	RDPRT tecla, teclado ; captura tecla
-	load temporal, tecla
 	comp tecla, 0x34
 	call z tecla_left
-	load tecla,temporal
 	comp tecla, 0x35
 	call z tecla_down
-	load tecla,temporal
 	comp tecla, 0x36
 	call z tecla_right
-	load tecla,temporal
 	comp tecla, 0x38
 	call z tecla_up
-	load tecla,temporal
 	comp tecla, 0x0D
 	call z escritura_hora_fecha
-	load tecla,temporal
 	comp tecla, 0x41
 	jump z main
 	call lectura_hora_fecha
@@ -137,26 +114,17 @@ configurar_fecha:
 configurar_timer:
 	load dato_contador, 0x18
 	WRPRT dato_contador, programar_configuracion
-	load temporal, alarma
-	comp temporal, 0x03
-	call z activar_alarma
 	RDPRT tecla, teclado ; captura tecla
-	load temporal, tecla
 	comp tecla, 0x34
 	call z tecla_left
-	load tecla,temporal
 	comp tecla, 0x35
 	call z tecla_down
-	load tecla,temporal
 	comp tecla, 0x36
 	call z tecla_right
-	load tecla,temporal
 	comp tecla, 0x38
 	call z tecla_up
-	load tecla,temporal
 	comp tecla, 0x0D
 	call z escritura_timer
-	load tecla,temporal
 	comp tecla, 0x41
 	jump z main
 	call lectura_hora_fecha
@@ -203,24 +171,24 @@ lectura_hora_fecha:
 	ret
 	
 lectura_timer:
-	load alarma, 0x00
+	load alarma, 0x00 ;no se cumple aun la condicion de activacion de alarma
 	load address, 0xF0
 	call lectura
 	load address, 0x41 	;lee seg_timer
 	call lectura
 	WRPRT data, in_seg_timer ;lee min_timer
 	comp data, timer_seg
-	jump z generacion_alarma
+	call z generacion_alarma
 	load address, 0x42
 	call lectura
 	WRPRT data, in_min_timer
 	comp data, timer_min
-	jump z generacion_alarma
-	load address, 0x43 ;lee dia_semana
+	call z generacion_alarma
+	load address, 0x43 ;lee hora del timer
 	call lectura
 	WRPRT data, in_hora_timer
 	comp data, timer_hora
-	jump z generacion_alarma
+	call z generacion_alarma
 	ret
 	
 escritura_timer:
@@ -321,14 +289,16 @@ generacion_alarma:
 	comp alarma, 0x03
 	call z activar_alarma
 	ret
+	
 activar_alarma:
 	or formato_alarma, 0x01
-	WRPRT formato_alarma, banderas_configuracion
+	WRPRT formato_alarma, banderas_configuracion ; escribe en registro valor para encnder la alarma
 	load alarma, 0x00
 	load address, 0x00
 	load data,0x00
-	call escritura
+	call escritura ;detiene el timer
 	ret
+	
 desactivar_alarma:
 	and formato_alarma, 0x02
 	WRPRT formato_alarma, banderas_configuracion
@@ -336,6 +306,7 @@ desactivar_alarma:
 	load timer_min, 0xFF
 	load timer_hora 0xFF
 	ret
+	
 cambiar_formato:
 	and formato_alarma, 0x03
 	add formato_alarma, 0x02
