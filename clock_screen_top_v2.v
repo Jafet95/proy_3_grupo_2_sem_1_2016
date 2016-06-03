@@ -26,7 +26,7 @@ input wire write_strobe, k_write_strobe,
 output wire [7:0]out_seg_hora,out_min_hora,out_hora_hora,
 output wire [7:0]out_dia_fecha,out_mes_fecha,out_jahr_fecha,
 output wire [7:0]out_seg_timer,out_min_timer,out_hora_timer,
-//output reg alarma_sonora,//Para sacar la señal para la alarma sonora
+output reg alarma_sonora,//Para sacar la señal para la alarma sonora
 output wire hsync, vsync,
 output wire [7:0] RGB
 //output wire pixel_tick
@@ -259,14 +259,14 @@ begin
 			blink_reg <= blink_reg + 1'b1;
 	end
 end
-/*
+
 //Generación de alarma sonora
 always@*
 begin
 	if (out_banderas_config[0] && blink) alarma_sonora = 1'b1;
 	else alarma_sonora = 1'b0;
 end
-*/
+
 //Parpadeo cursor
 always @(posedge clock, posedge reset)
 begin

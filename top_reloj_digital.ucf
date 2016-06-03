@@ -68,3 +68,5 @@ NET "dato[0]" PULLUP;
 
 NET "ps2data" LOC = "J13" | IOSTANDARD = "LVCMOS33" | PULLUP;  
 NET "ps2clk"  LOC = "L12" | IOSTANDARD = "LVCMOS33" | PULLUP;
+
+NET "alarma_sonora" LOC = "T12" | IOSTANDARD = "LVCMOS33";

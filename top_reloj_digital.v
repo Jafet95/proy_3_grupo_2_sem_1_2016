@@ -25,6 +25,7 @@ input wire ps2data,
 input wire ps2clk, 
 inout [7:0] dato,
 output wire AD, CS, WR, RD,
+output wire alarma_sonora,
 output wire [7:0] RGB,
 output wire hsync, vsync
 );
@@ -109,7 +110,8 @@ controlador_VGA instancia_controlador_VGA
     .out_jahr_fecha(out_jahr_fecha), 
     .out_seg_timer(out_seg_timer), 
     .out_min_timer(out_min_timer), 
-    .out_hora_timer(out_hora_timer), 
+    .out_hora_timer(out_hora_timer),
+	 .alarma_sonora(alarma_sonora),
     .hsync(hsync), 
     .vsync(vsync), 
     .RGB(RGB)
